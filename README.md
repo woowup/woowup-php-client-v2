@@ -29,3 +29,4 @@ The documentation for the WoowUp API is located [here](https://docs.woowup.com).
 
 * PHP >= 5.3
 * The PHP JSON extension
+* PHP Internationalisation module (phpX.X-intl)
