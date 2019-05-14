@@ -2,7 +2,9 @@
 
 namespace WoowUp\Models;
 
-class UserModel implements \JsonSerializable
+use WoowUp\Support\Genderizer as Genderizer;
+
+class UserModel extends BaseModel implements \JsonSerializable
 {
     const FEMALE_GENDER_VALUE = 'F';
     const MALE_GENDER_VALUE = 'M';
@@ -70,6 +72,9 @@ class UserModel implements \JsonSerializable
     private $userapp_id;
     private $user_id;
     private $app_id;
+
+    // Additional properties
+    private $genderize_apikey;
 
     /**
      * Constructor
@@ -148,9 +153,14 @@ class UserModel implements \JsonSerializable
      * Set email
      * @param string $email [description]
      */
-    public function setEmail(string $email)
+    public function setEmail(string $email, $sanitize = false)
     {
         if ($email !== '') {
+            if ($sanitize) {
+                if (($email = $this->sanitizeEmail($email)) === false) {
+                    throw new \Exception("Email sanitization failed", 1);
+                }
+            }
             $this->email = $email;
 
             $this->clearUserId();
@@ -174,9 +184,9 @@ class UserModel implements \JsonSerializable
      * Set first_name
      * @param string $first_name [description]
      */
-    public function setFirstName(string $first_name)
+    public function setFirstName(string $first_name, $prettify = true)
     {
-        $this->first_name = $first_name;
+        $this->first_name = $prettify ? $this->prettifyString($first_name) : $first_name;
 
         return $this;
     }
@@ -194,9 +204,9 @@ class UserModel implements \JsonSerializable
      * Set last_name
      * @param string $last_name [description]
      */
-    public function setLastName(string $last_name)
+    public function setLastName(string $last_name, $prettify = true)
     {
-        $this->last_name = $last_name;
+        $this->last_name = $prettify ? $this->prettifyString($last_name) : $last_name;
 
         return $this;
     }
@@ -215,9 +225,9 @@ class UserModel implements \JsonSerializable
      * @param mixed $telephone
      * @return self
      */
-    public function setTelephone(string $telephone)
+    public function setTelephone(string $telephone, $normalize = true)
     {
-        $this->telephone = $telephone;
+        $this->telephone = $normalize ? $this->normalizeTelephone($telephone) : $telephone;
 
         return $this;
     }
@@ -249,7 +259,7 @@ class UserModel implements \JsonSerializable
      */
     public function getGender()
     {
-        return $this->gender;
+        return isset($this->gender) ? $this->gender : null;
     }
 
     /**
@@ -284,9 +294,9 @@ class UserModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setStreet(string $street)
+    public function setStreet(string $street, $normalize = true)
     {
-        $this->street = $street;
+        $this->street = $normalize ? $this->normalizeAddress($street) : $street;
 
         return $this;
     }
@@ -715,11 +725,20 @@ class UserModel implements \JsonSerializable
     public function setClubInscriptionDate($club_inscription_date)
     {
         $this->club_inscription_date = $club_inscription_date;
+
+        return $this;
     }
 
     public function getClubInscriptionDate()
     {
         return $this->club_inscription_date;
+    }
+
+    public function setGenderizeApikey($genderize_apikey)
+    {
+        $this->genderize_apikey = $genderize_apikey;
+
+        return $this;
     }
 
     /**
@@ -815,6 +834,24 @@ class UserModel implements \JsonSerializable
         }
 
         return $user;
+    }
+
+    public function sortNames()
+    {
+        $genderizer = new Genderizer(isset($this->genderize_apikey) ? $this->genderize_apikey : null);
+
+        if (!($gender = $genderizer->getGender($this->getFirstName()))) { // El primer nombre no devuelve un genero, pruebo con el apellido
+            if ($gender = $genderizer->getGender($this->getLastName())) {
+                $auxFirstName     = $this->getFirstName();
+                $this->setFirstName($this->getLastName());
+                $this->setLastName($auxFirstName);
+                $this->setGender($gender);
+            }
+        } else {
+            $this->setGender($gender);
+        }
+
+        return $this;
     }
 
     private function clearUserId()

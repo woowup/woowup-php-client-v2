@@ -1,7 +1,8 @@
 {
     "name": "woowup/woowup-php-client",
     "require": {
-        "guzzlehttp/guzzle": "^6.3"
+        "guzzlehttp/guzzle": "^6.3",
+        "kcassam/mailcheck": "dev-master"
     },
     "authors": [
         {
