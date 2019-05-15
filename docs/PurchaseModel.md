@@ -4,7 +4,7 @@ Before checking this model out, it is recommended to take a look at the followin
 + [PurchaseItemModel documentation](PurchaseItemModel.md)
 + [PurchasePricesModel documentation](PurchasePricesModel.md)
 + [PurchasePaymentModel documentation](PurchasePaymentModel.md)
-+ [SellerModel documentation](SellerModel.md)
++ [SellerModel documentation](SellerModel.md) (optional)
 
 ## List of methods
 
@@ -41,8 +41,8 @@ To have a valid Purchase the following fields must be defined:
 Also, the following must be valid:
 + prices as PurchasePricesModel
 + payment as PurchasePaymentModel or array of PurchasePaymentModel
-+ seller as SellerModel
 + purchase_detail as array of PurchaseItemModel
++ (only if set) seller as SellerModel
 
 ## Example
 ```php
