@@ -6,11 +6,9 @@ class Genderizer {
 	const API_URL = 'https://api.genderize.io/';
 	const PROBABILITY_THRESHOLD = 0.75;
 
-	protected $apikey;
-
-	public function __construct($apikey = null)
+	public function __construct()
 	{
-		$this->apikey = $apikey;
+		return $this;
 	}
 
 	public function getGender($name)
@@ -34,8 +32,8 @@ class Genderizer {
 
         $url = self::API_URL . "?name=$name";
 
-        if (isset($this->apikey) && !is_null($this->apikey)) {
-            $url .= "&apikey=" . $this->apikey;
+        if (isset($_ENV['genderizeApikey']) && !is_null($_ENV['genderizeApikey'])) {
+            $url .= "&apikey=" . $_ENV['genderizeApikey'];
         }
 
         curl_setopt_array($curl, array(
