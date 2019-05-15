@@ -1,9 +1,10 @@
 Represents a purchase
 
 Before checking this model out, it is recommended to take a look at the following:
-+ PurchaseItemModel
-+ PurchasePricesModel
-+ PurchasePaymentModel
++ [PurchaseItemModel documentation](PurchaseItemModel.md)
++ [PurchasePricesModel documentation](PurchasePricesModel.md)
++ [PurchasePaymentModel documentation](PurchasePaymentModel.md)
++ [SellerModel documentation](SellerModel.md)
 
 ## List of methods
 
@@ -66,8 +67,17 @@ $purchase->setPurchaseDetail(buildPurchaseDetail());
 // Adding prices
 $purchase->setPrices(buildPrices('1299.99', '299.99', '1000'));
 
+// Setting channel
+$purchase->setChannel('web');
+
+// Setting branch name
+$purchase->setBranchName('Ecommerce');
+
+// Setting createtime
+$purchase->setCreatetime(date('c'));
+
 /*
- *
+ * Builds purchase prices
  */
 function buildPrices($gross, $discount, $total)
 {
