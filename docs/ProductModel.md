@@ -1,4 +1,4 @@
-Represents a product
+Represents a Product
 
 Before checking this model out, it is recommended to take a look at the following:
 + [CategoryModel documentation](CategoryModel.md)
