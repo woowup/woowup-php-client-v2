@@ -1,3 +1,8 @@
+Represents a product
+
+Before checking this model out, it is recommended to take a look at the following:
++ [CategoryModel documentation](CategoryModel.md)
+
 ## List of methods
 
 | Field in API | Setter in php-client-v2 | Getter in php-client-v2 | Comments |
