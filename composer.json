@@ -1,13 +1,13 @@
 {
-    "name": "woowup/woowup-php-client",
+    "name": "woowup/woowup-php-client-v2",
     "require": {
         "guzzlehttp/guzzle": "^6.3",
         "kcassam/mailcheck": "dev-master"
     },
     "authors": [
         {
-            "name": "Diego Rivas",
-            "email": "diego@woowup.com"
+            "name": "Federico Burgardt",
+            "email": "federico@woowup.com"
         }
     ],
     "autoload": {

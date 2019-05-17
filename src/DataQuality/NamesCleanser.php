@@ -74,33 +74,3 @@ class NamesCleanser
 		return ucwords(mb_strtolower(trim($name)));
 	}
 }
-
-
-
-
-// splittedNames = [
-//     'firstname' => [],
-//     'lastname'  => [],
-// ]
-// parts = explode(fullname)
-// if (count(parts) < 1) {
-//     throw exception
-// }
-// name = array_shift(parts)
-// originalGender = gender(name)
-// whichName = (originalGender !== false) ? 'firstname' : 'lastname';
-// splittedNames[whichName][] = name; 
-// 
-// changed = false
-// while ((count(parts) > 0) && !changed) {
-//     name = array_shift(parts)
-//     if (gender(name) !== originalGender) { // cambió
-//         changed = true
-//     } else {
-//         splittedNames[whichName][] = name
-//     }
-// }
-// whichName = (whichName === 'firstname') ? 'lastname' : 'firstname'
-// splittedNames[whichName] = parts
-// 
-// return array(implode(' ', splittedNames['firstname']), implode(' ', splittedNames['lastname']))
