@@ -1,5 +1,6 @@
 {
     "name": "woowup/woowup-php-client-v2",
+    "minimum-stability": "dev",
     "require": {
         "guzzlehttp/guzzle": "^6.3",
         "kcassam/mailcheck": "dev-master"
