@@ -1,4 +1,4 @@
-Represents the category of a [Product](ProductModel.md)
+Represents the Category of a [Product](ProductModel.md)
 
 ## List of methods
 
