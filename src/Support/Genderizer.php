@@ -3,7 +3,7 @@
 namespace WoowUpV2\Support;
 
 class Genderizer {
-	const API_URL = 'https://api.genderize.io/';
+	const API_URL = 'https://genderize.woowup.com/';
 	const PROBABILITY_THRESHOLD = 0.75;
 
 	public function __construct()
@@ -19,6 +19,7 @@ class Genderizer {
 		}
 
 		$response = $this->genderize(urlencode($name));
+
         if (isset($response->gender) && ($response->gender !== null) && ($response->probability >= self::PROBABILITY_THRESHOLD)) {
             return ($response->gender === "male") ? "M" : "F";
         } else {
