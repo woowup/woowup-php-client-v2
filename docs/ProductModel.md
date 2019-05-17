@@ -18,7 +18,7 @@ Before checking this model out, it is recommended to take a look at the followin
 | offer_price | setOfferPrice(*float* $offer_price) | getOfferPrice() | Special-offer price |
 | stock | setStock(*int* $stock) | getStock() | |
 | available | setAvailable(*boolean* $available) | getAvailable() | |
-| category | setCategory(*array* $category)<br>addCategory(*\WoowUp\Models\CategoryModel* $category) | getCategory() | |
+| category | setCategory(*array* $category)<br>addCategory(*\WoowUpV2\Models\CategoryModel* $category) | getCategory() | |
 | specifications | setSpecifications(*array* $specifications) | getSpecifications() | |
 | metadata | setMetadata($metadata) | getMetadata() | |
 | id | *not available* | getId() | WoowUp's product-id |
@@ -35,11 +35,11 @@ To have a valid Product the following fields must be defined:
 ```php
 <?php
 
-include '\WoowUp\Models\ProductModel';
-include '\WoowUp\Models\CategoryModel';
+include '\WoowUpV2\Models\ProductModel';
+include '\WoowUpV2\Models\CategoryModel';
 
 // Creating empty product
-$product = new \WoowUp\Models\ProductModel();
+$product = new \WoowUpV2\Models\ProductModel();
 
 // Setting SKU and name
 $product->setSku('JCK-001-234');
@@ -49,11 +49,11 @@ $product->setName('Winter Jacket 001');
 var_dump($product->validate());
 
 // Creating a category and a subcategory Jackets -> Winter
-$category = new \WoowUp\Models\CategoryModel();
+$category = new \WoowUpV2\Models\CategoryModel();
 $category->setId('JCK');
 $category->setName('Jackets');
 
-$subcategory = new \WoowUp\Models\CategoryModel();
+$subcategory = new \WoowUpV2\Models\CategoryModel();
 $subcategory->setId('WNT');
 $subcategory->setName('Winter');
 

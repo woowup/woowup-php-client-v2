@@ -1,6 +1,6 @@
 <?php
 
-namespace WoowUp\Models;
+namespace WoowUpV2\Models;
 
 class CategoryModel implements \JsonSerializable
 {

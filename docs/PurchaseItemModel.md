@@ -27,10 +27,10 @@ To have a valid PurchaseItem the following fields must be defined:
 ```php
 <?php
 
-include '\WoowUp\Models\PurchaseItemModel';
+include '\WoowUpV2\Models\PurchaseItemModel';
 
 // Creating empty purchase item
-$item = new \WoowUp\Models\PurchaseItemModel();
+$item = new \WoowUpV2\Models\PurchaseItemModel();
 
 // Setting SKU and name
 $item->setSku('JCK-001-234');

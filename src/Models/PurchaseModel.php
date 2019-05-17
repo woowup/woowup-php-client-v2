@@ -1,11 +1,11 @@
 <?php
 
-namespace WoowUp\Models;
+namespace WoowUpV2\Models;
 
-use WoowUp\Models\PurchaseItemModel as Item;
-use WoowUp\Models\PurchasePricesModel as Prices;
-use WoowUp\Models\PurchasePaymentModel as Payment;
-use WoowUp\Models\SellerModel as Seller;
+use WoowUpV2\Models\PurchaseItemModel as Item;
+use WoowUpV2\Models\PurchasePricesModel as Prices;
+use WoowUpV2\Models\PurchasePaymentModel as Payment;
+use WoowUpV2\Models\SellerModel as Seller;
 
 class PurchaseModel implements \JsonSerializable
 {
@@ -267,7 +267,7 @@ class PurchaseModel implements \JsonSerializable
     public function setPurchaseDetail(array $purchase_detail)
     {
         foreach ($purchase_detail as $key => $item) {
-            if (!is_a($item, 'WoowUpClasses\PurchaseItem') || !$item->validate()) {
+            if (!is_a($item, 'WoowUpV2\Models\PurchaseItemModel') || !$item->validate()) {
                 throw new \Exception("Not valid item at index $key of purchase_detail", 1);
             }
         }
@@ -463,11 +463,11 @@ class PurchaseModel implements \JsonSerializable
 
         if (is_array($payment)) {
             foreach ($payment as $p) {
-                if (!is_a($p, 'WoowUp\Models\PurchasePaymentModel') || !$p->validate() || !$p->getTotal()) {
+                if (!is_a($p, 'WoowUpV2\Models\PurchasePaymentModel') || !$p->validate() || !$p->getTotal()) {
                     return false;
                 }
             }
-        } elseif (!is_a($payment, 'WoowUp\Models\PurchasePaymentModel') || !$payment->validate()) {
+        } elseif (!is_a($payment, 'WoowUpV2\Models\PurchasePaymentModel') || !$payment->validate()) {
             return false;
         }
 

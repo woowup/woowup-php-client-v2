@@ -20,10 +20,10 @@ To have a valid PurchasePrices the following fields must be defined:
 ```php
 <?php
 
-include '\WoowUp\Models\PurchasePricesModel';
+include '\WoowUpV2\Models\PurchasePricesModel';
 
 // Creating empty purchase prices
-$prices = new \WoowUp\Models\PurchasePricesModel();
+$prices = new \WoowUpV2\Models\PurchasePricesModel();
 
 // Setting total
 $prices->setTotal(900.0);

@@ -1,8 +1,8 @@
-<?php
+<?phpWoowUp
 
-namespace WoowUp\DataQuality;
+namespace WoowUpV2\DataQuality;
 
-use WoowUp\Support\Genderizer as Genderizer;
+use WoowUpV2\Support\Genderizer as Genderizer;
 
 class NamesCleanser
 {

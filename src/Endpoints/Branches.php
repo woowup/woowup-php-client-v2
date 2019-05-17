@@ -1,5 +1,5 @@
 <?php
-namespace WoowUp\Endpoints;
+namespace WoowUpV2\Endpoints;
 
 /**
  *

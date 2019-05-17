@@ -1,5 +1,5 @@
 <?php
-namespace WoowUp\Endpoints;
+namespace WoowUpV2\Endpoints;
 
 /**
  *
@@ -17,7 +17,7 @@ class Users extends Endpoint
         parent::__construct($host, $apikey);
     }
 
-    public function update(\WoowUp\Models\UserModel $user)
+    public function update(\WoowUpV2\Models\UserModel $user)
     {
         if (!$user->validate()) {
             throw new \Exception("User is not valid", 1);
@@ -28,7 +28,7 @@ class Users extends Endpoint
         return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
     }
 
-    public function create(\WoowUp\Models\UserModel $user)
+    public function create(\WoowUpV2\Models\UserModel $user)
     {
         if (!$user->validate()) {
             throw new \Exception("User is not valid", 1);
@@ -68,7 +68,7 @@ class Users extends Endpoint
             $data = json_decode($response->getBody());
 
             if (isset($data->payload)) {
-                return \WoowUp\Models\UserModel::createFromJson(json_encode($data->payload));
+                return \WoowUpV2\Models\UserModel::createFromJson(json_encode($data->payload));
             }
         }
 
@@ -89,7 +89,7 @@ class Users extends Endpoint
             if (isset($data->payload)) {
                 $result = [];
                 foreach ($data->payload as $value) {
-                    $result[] = \WoowUp\Models\UserModel::createFromJson(json_encode($value));
+                    $result[] = \WoowUpV2\Models\UserModel::createFromJson(json_encode($value));
                 }
 
                 return $result;

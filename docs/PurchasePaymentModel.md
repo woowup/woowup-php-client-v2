@@ -20,10 +20,10 @@ To have a valid PurchasePayment the following fields must be defined:
 ```php
 <?php
 
-include '\WoowUp\Models\PurchasePaymentModel';
+include '\WoowUpV2\Models\PurchasePaymentModel';
 
 // Creating empty purchase payment
-$payment = new \WoowUp\Models\PurchasePayment();
+$payment = new \WoowUpV2\Models\PurchasePayment();
 
 // Setting type
 $payment->setType('credit');

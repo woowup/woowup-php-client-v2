@@ -1,6 +1,6 @@
 <?php
 
-namespace WoowUp\DataQuality;
+namespace WoowUpV2\DataQuality;
 
 use Mailcheck\Mailcheck as Mailcheck;
 

@@ -1,16 +1,16 @@
 <?php
-namespace WoowUp;
+namespace WoowUpV2;
 
-use WoowUp\Endpoints\AbandonedCarts;
-use WoowUp\Endpoints\Blacklist;
-use WoowUp\Endpoints\Branches;
-use WoowUp\Endpoints\Events;
-use WoowUp\Endpoints\Products;
-use WoowUp\Endpoints\Purchases;
-use WoowUp\Endpoints\UserEvents;
-use WoowUp\Endpoints\Users;
-use WoowUp\Endpoints\Account;
-use WoowUp\Endpoints\Multiusers;
+use WoowUpV2\Endpoints\AbandonedCarts;
+use WoowUpV2\Endpoints\Blacklist;
+use WoowUpV2\Endpoints\Branches;
+use WoowUpV2\Endpoints\Events;
+use WoowUpV2\Endpoints\Products;
+use WoowUpV2\Endpoints\Purchases;
+use WoowUpV2\Endpoints\UserEvents;
+use WoowUpV2\Endpoints\Users;
+use WoowUpV2\Endpoints\Account;
+use WoowUpV2\Endpoints\Multiusers;
 
 class Client
 {
@@ -18,55 +18,55 @@ class Client
 
     /**
      * Purchases endpoint wrapper
-     * @var WoowUp\Endpoints\Purchases
+     * @var WoowUpV2\Endpoints\Purchases
      */
     public $purchases;
 
     /**
      * Users endpoint wrapper
-     * @var WoowUp\Endpoints\Users
+     * @var WoowUpV2\Endpoints\Users
      */
     public $users;
 
     /**
      * Products endpoint wrapper
-     * @var WoowUp\Endpoints\Products
+     * @var WoowUpV2\Endpoints\Products
      */
     public $products;
 
     /**
      * Abandoned Cart endpoint wrapper
-     * @var WoowUp\Endpoints\AbandonedCarts
+     * @var WoowUpV2\Endpoints\AbandonedCarts
      */
     public $abadonedCarts;
 
     /**
      * Events endpoint wrapper
-     * @var WoowUp\Endpoints\Events
+     * @var WoowUpV2\Endpoints\Events
      */
     public $events;
 
     /**
      * UserEvents endpoint wrapper
-     * @var WoowUp\Endpoints\UserEvents
+     * @var WoowUpV2\Endpoints\UserEvents
      */
     public $userEvents;
 
     /**
      * Branches endpoint wrapper
-     * @var WoowUp\Endpoints\Branches
+     * @var WoowUpV2\Endpoints\Branches
      */
     public $branches;
   
     /**
      * Account endpoint wrapper
-     * @var WoowUp\Endpoints\Account
+     * @var WoowUpV2\Endpoints\Account
      */
     public $account;
 
     /**
      * Blacklist endpoint wrapper
-     * @var WoowUp\Endpoints\Blacklist
+     * @var WoowUpV2\Endpoints\Blacklist
      */
     public $blacklist;
 

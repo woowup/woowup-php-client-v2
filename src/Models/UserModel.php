@@ -1,8 +1,8 @@
 <?php
 
-namespace WoowUp\Models;
+namespace WoowUpV2\Models;
 
-use WoowUp\DataQuality\DataCleanser as DataCleanser;
+use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
 
 class UserModel implements \JsonSerializable
 {

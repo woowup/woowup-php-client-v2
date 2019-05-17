@@ -1,6 +1,6 @@
 <?php
 
-namespace WoowUp\Support;
+namespace WoowUpV2\Support;
 
 class Genderizer {
 	const API_URL = 'https://api.genderize.io/';

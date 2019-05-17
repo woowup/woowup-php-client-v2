@@ -36,10 +36,10 @@ To have a valid User the following fields must be defined:
 ```php
 <?php
 
-include '\WoowUp\Models\UserModel';
+include '\WoowUpV2\Models\UserModel';
 
 // Creating empty user
-$user = new \WoowUp\Models\UserModel();
+$user = new \WoowUpV2\Models\UserModel();
 
 // Setting document
 $user->setDocument('12345678');

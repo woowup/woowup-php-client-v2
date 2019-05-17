@@ -1,8 +1,8 @@
 <?php
 
-namespace WoowUp\Models;
+namespace WoowUpV2\Models;
 
-use WoowUp\Models\CategoryModel;
+use WoowUpV2\Models\CategoryModel;
 
 class ProductModel implements \JsonSerializable
 {
@@ -270,18 +270,18 @@ class ProductModel implements \JsonSerializable
     {
         if (is_array($category)) {
             foreach ($category as $c) {
-                if (is_a($c, 'WoowUpClasses\Category')) {
+                if (is_a($c, 'WoowUpV2\Models\CategoryModel')) {
                     $this->addCategory($c);
                 } elseif (is_string($c)) {
                     $this->category[] = $c;
                 } else {
-                    throw new \Exception("Category list must be an array of string or WoowUpClasses\Category", 1);
+                    throw new \Exception("Category list must be an array of string or WoowUpV2\Models\CategoryModel", 1);
                 }
             }
 
             return $this;
         }
-        throw new \Exception("Category list must be an array of WoowUpCategory", 1);
+        throw new \Exception("Category list must be an array of CategoryModel", 1);
     }
 
     /**

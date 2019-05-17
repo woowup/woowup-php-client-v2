@@ -1,8 +1,8 @@
 <?php
 
-namespace WoowUp\Models;
+namespace WoowUpV2\Models;
 
-use WoowUp\Models\ProductModel as WoowUpProduct;
+use WoowUpV2\Models\ProductModel as WoowUpProduct;
 
 class PurchaseItemModel extends WoowUpProduct
 {

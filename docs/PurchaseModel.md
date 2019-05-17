@@ -16,13 +16,13 @@ Before checking this model out, it is recommended to take a look at the followin
 | document | setDocument(*string* $document) | getDocument() | |
 | points | setPoints(*int* $points) | getPoints() | Loyalty points rewarded for the purchase |
 | channel | setChannel(*string* $channel) | getChannel() | Valid values: 'web', 'telephone', 'in-store', 'corporate', 'direct', 'other'. |
-| purchase_detail | setPurchaseDetail(*array* $purchase_detail) <br> addItem(*\WoowUp\Models\PurchaseItemModel* $item) | getPurchaseDetail() | |
-| prices | setPrices(*\WoowUp\Models\PurchasePricesModel* $prices) | getPrices() | |
+| purchase_detail | setPurchaseDetail(*array* $purchase_detail) <br> addItem(*\WoowUpV2\Models\PurchaseItemModel* $item) | getPurchaseDetail() | |
+| prices | setPrices(*\WoowUpV2\Models\PurchasePricesModel* $prices) | getPrices() | |
 | payment | setPayment(*array* $payments) | getPayment() | Sets several payments. Must be an array of PurchasePaymentModel and every payment must have 'type' and 'total' |
-| payment | setPayment(*\WoowUp\Models\PurchasePaymentModel* $payment) | getPayment() | Sets only one payment of type PurchasePaymentModel. Must have 'type' defined |
-| payment | addPayment(*\WoowUp\Models\PurchasePaymentModel* $payment) | | Adds a payment of type PurchasePaymentModel |
+| payment | setPayment(*\WoowUpV2\Models\PurchasePaymentModel* $payment) | getPayment() | Sets only one payment of type PurchasePaymentModel. Must have 'type' defined |
+| payment | addPayment(*\WoowUpV2\Models\PurchasePaymentModel* $payment) | | Adds a payment of type PurchasePaymentModel |
 | branch_name | setBranchName(*string* branch_name) | getBranchName() | |
-| seller | setSeller(*\WoowUp\Models\SellerModel* $seller) | getSeller() | See SellerModel.md |
+| seller | setSeller(*\WoowUpV2\Models\SellerModel* $seller) | getSeller() | See SellerModel.md |
 | createtime | setCreatetime(*string* $createtime) | getCreatetime() | Format: YYYY-MM-DD HH:ii:ss |
 | approvedtime | setApprovedTime(*string* $approvedtime) | getApprovedTime() | Format: YYYY-MM-DD HH:ii:ss |
 | metadata | setMetadata($metadata) | getMetadata() | |
@@ -48,14 +48,14 @@ Also, the following must be valid:
 ```php
 <?php
 
-include '\WoowUp\Models\PurchaseModel';
-include '\WoowUp\Models\PurchasePricesModel';
-include '\WoowUp\Models\PurchasePaymentModel';
-include '\WoowUp\Models\PurchaseItemModel';
-include '\WoowUp\Models\SellerModel';
+include '\WoowUpV2\Models\PurchaseModel';
+include '\WoowUpV2\Models\PurchasePricesModel';
+include '\WoowUpV2\Models\PurchasePaymentModel';
+include '\WoowUpV2\Models\PurchaseItemModel';
+include '\WoowUpV2\Models\SellerModel';
 
 // Creating empty purchase
-$purchase = new \WoowUp\Models\PurchaseModel;
+$purchase = new \WoowUpV2\Models\PurchaseModel;
 
 // Setting invoice_number and customer's email
 $purchase->setInvoiceNumber('P-001');
@@ -84,7 +84,7 @@ var_dump($purchase->validate());
  */
 function buildPrices($gross, $discount, $total)
 {
-    $prices = new \WoowUp\Models\PurchasePricesModel();
+    $prices = new \WoowUpV2\Models\PurchasePricesModel();
     $prices
         ->setGross($gross)
         ->setDiscount($discount)
@@ -109,7 +109,7 @@ function buildPurchaseDetail()
 function buildItem($sku, $name, $quantity, $unitPrice, $size, $color)
 {
     // Creating empty purchase item
-    $item = new \WoowUp\Models\PurchaseItemModel();
+    $item = new \WoowUpV2\Models\PurchaseItemModel();
     
     // Setting all the fields
     $item

@@ -18,11 +18,11 @@ To have a valid Seller the following fields must be defined:
 ```php
 <?php
 
-include '\WoowUp\Models\PurchaseModel';
-include '\WoowUp\Models\SellerModel';
+include '\WoowUpV2\Models\PurchaseModel';
+include '\WoowUpV2\Models\SellerModel';
 
 // Creating empty seller
-$seller = new \WoowUp\Models\SellerModel();
+$seller = new \WoowUpV2\Models\SellerModel();
 
 // Setting name and email
 $seller->setName('John Doe');
@@ -32,7 +32,7 @@ $seller->setEmail('john.doe@example.com');
 var_dump($seller->validate());
 
 // Creating empty purchase
-$purchase = new \WoowUp\Models\PurchaseModel();
+$purchase = new \WoowUpV2\Models\PurchaseModel();
 
 // Adding seller to the purchase
 $purchase->setSeller($seller);

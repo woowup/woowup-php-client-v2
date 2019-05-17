@@ -19,10 +19,10 @@ To have a valid Category the following fields must be defined:
 ```php
 <?php
 
-include '\WoowUp\Models\CategoryModel';
+include '\WoowUpV2\Models\CategoryModel';
 
 // Creating empty category
-$category = new \WoowUp\Models\CategoryModel();
+$category = new \WoowUpV2\Models\CategoryModel();
 
 // Setting id and name
 $category->setId('JCK');

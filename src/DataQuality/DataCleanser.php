@@ -1,10 +1,10 @@
 <?php
 
-namespace WoowUp\DataQuality;
+namespace WoowUpV2\DataQuality;
 
-use WoowUp\DataQuality\EmailCleanser as EmailCleanser;
-use WoowUp\DataQuality\NamesCleanser as NamesCleanser;
-use WoowUp\DataQuality\TelephoneCleanser as TelephoneCleanser;
+use WoowUpV2\DataQuality\EmailCleanser as EmailCleanser;
+use WoowUpV2\DataQuality\NamesCleanser as NamesCleanser;
+use WoowUpV2\DataQuality\TelephoneCleanser as TelephoneCleanser;
 
 class DataCleanser
 {
