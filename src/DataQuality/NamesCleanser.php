@@ -1,4 +1,4 @@
-<?phpWoowUp
+<?php
 
 namespace WoowUpV2\DataQuality;
 
