@@ -1,7 +1,7 @@
 <?php
-namespace WoowUpTest\WoowUp;
+namespace WoowUpV2Test\WoowUp;
 
-use WoowUp\Client as WoowUp;
+use WoowUpV2\Client as WoowUp;
 
 /**
  *

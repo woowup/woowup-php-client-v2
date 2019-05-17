@@ -13,8 +13,8 @@
     ],
     "autoload": {
         "psr-4": {
-            "WoowUp\\": "src/",
-            "WoowUpTest\\": "tests/"
+            "WoowUpV2\\": "src/",
+            "WoowUpV2Test\\": "tests/"
         }
     },
     "require-dev": {
