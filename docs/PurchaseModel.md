@@ -76,6 +76,9 @@ $purchase->setBranchName('Ecommerce');
 // Setting createtime
 $purchase->setCreatetime(date('c'));
 
+// Validation should return true
+var_dump($purchase->validate());
+
 /*
  * Builds purchase prices
  */
