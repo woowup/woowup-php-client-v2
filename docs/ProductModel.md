@@ -1,3 +1,8 @@
+Represents a Product
+
+Before checking this model out, it is recommended to take a look at the following:
++ [CategoryModel documentation](CategoryModel.md)
+
 ## List of methods
 
 | Field in API | Setter in php-client-v2 | Getter in php-client-v2 | Comments |
@@ -20,6 +25,12 @@
 | createtime | *not available* | getCreatetime() | |
 | updatetime | *not available* | getUpdatetime() | |
 
+## Validation
+
+To have a valid Product the following fields must be defined:
++ sku
++ name
+
 ### Example
 ```php
 <?php
@@ -33,6 +44,9 @@ $product = new \WoowUp\Models\ProductModel();
 // Setting SKU and name
 $product->setSku('JCK-001-234');
 $product->setName('Winter Jacket 001');
+
+// Validation should return true
+var_dump($product->validate());
 
 // Creating a category and a subcategory Jackets -> Winter
 $category = new \WoowUp\Models\CategoryModel();

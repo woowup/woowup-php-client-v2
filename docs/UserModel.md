@@ -27,6 +27,11 @@
 | custom_attributes | setCustomAttributes(*array* $custom_attributes)<br>setCustomAttributes(*stdClass* $custom_attributes)<br>addCustomAttribute(*string* $key, *string* $value) | getCustomAttributes() | Usage is explained below |
 | club_inscription_date | setClubInscriptionDate(*string* $club_inscription_date) | getClubInscriptionDate() | Date of inscription to loyalty program. Format: "YYYY-MM-DD" or "YYYY-MM-DD H:i:s"|
 
+## Validation
+
+To have a valid User the following fields must be defined:
++ email, document and/or service_uid
+
 ### Example
 ```php
 <?php
@@ -38,6 +43,9 @@ $user = new \WoowUp\Models\UserModel();
 
 // Setting document
 $user->setDocument('12345678');
+
+// Validation should return true
+var_dump($user->validate());
 
 // Setting names
 $user->setFirstName('John');
