@@ -2,7 +2,7 @@ Represents an item in a purchase
 
 ## List of methods
 
-PurchaseItemModel extends [ProductModel][Link a ProductModel.md]. The additional methods regard product's quantity, unit price, variations and warranties.
+PurchaseItemModel extends [ProductModel](ProductModel.md). The additional methods regard product's quantity, unit price, variations and warranties.
 
 | Field in API | Setter in php-client-v2 | Getter in php-client-v2 | Comments |
 | --- | --- | --- | --- |
