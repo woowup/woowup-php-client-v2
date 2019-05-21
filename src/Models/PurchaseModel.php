@@ -20,6 +20,7 @@ class PurchaseModel implements \JsonSerializable
     private $service_uid;
     private $email;
     private $document;
+    private $telephone;
     private $points;
     private $channel;
     private $purchase_detail = [];
@@ -201,6 +202,28 @@ class PurchaseModel implements \JsonSerializable
     public function setDocument($document)
     {
         $this->document = $document;
+
+        $this->clearUserId();
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTelephone()
+    {
+        return $this->telephone;
+    }
+
+    /**
+     * @param mixed $document
+     *
+     * @return self
+     */
+    public function setTelephone($telephone)
+    {
+        $this->telephone = $telephone;
 
         $this->clearUserId();
 
@@ -486,6 +509,10 @@ class PurchaseModel implements \JsonSerializable
 
         if (!isset($this->email) || empty($this->email)) {
             unset($this->email);
+        }
+
+        if (!isset($this->telephone) || empty($this->telephone)) {
+            unset($this->telephone);
         }
     }
 }
