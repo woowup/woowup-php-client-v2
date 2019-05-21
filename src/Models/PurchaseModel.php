@@ -147,7 +147,7 @@ class PurchaseModel implements \JsonSerializable
      */
     public function getServiceUid()
     {
-        return $this->service_uid;
+        return isset($this->service_uid) ? $this->service_uid : null;
     }
 
     /**
@@ -169,7 +169,7 @@ class PurchaseModel implements \JsonSerializable
      */
     public function getEmail()
     {
-        return $this->email;
+        return isset($this->email) ? $this->email : null;
     }
 
     /**
@@ -191,7 +191,7 @@ class PurchaseModel implements \JsonSerializable
      */
     public function getDocument()
     {
-        return $this->document;
+        return isset($this->document) ? $this->document : null;
     }
 
     /**
