@@ -16,6 +16,10 @@ class PurchasePricesModel implements \JsonSerializable
 
     public function __construct()
     {
+        foreach (get_object_vars($this) as $key => $value) {
+            unset($this->{$key});
+        }
+
         return $this;
     }
 
@@ -159,5 +163,18 @@ class PurchasePricesModel implements \JsonSerializable
         }
 
         return $array;
+    }
+
+    public static function createFromJson($json)
+    {
+        $prices = new self();
+
+        foreach (json_decode($json, true) as $key => $value) {
+            if (in_array($key, array_keys(get_class_vars(get_class($prices))))) {
+                $prices->{$key} = $value;
+            }
+        }
+
+        return $prices;
     }
 }

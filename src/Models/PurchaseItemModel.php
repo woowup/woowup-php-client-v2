@@ -16,6 +16,10 @@ class PurchaseItemModel extends WoowUpProduct
 
     public function __construct()
     {
+        parent::__construct();
+        foreach (get_object_vars($this) as $key => $value) {
+            unset($this->{$key});
+        }
         return $this;
     }
 
@@ -194,5 +198,31 @@ class PurchaseItemModel extends WoowUpProduct
         }
 
         return $array;
+    }
+
+    public static function createFromJson($json)
+    {
+        $item = new self();
+
+        foreach (json_decode($json, true) as $key => $value) {
+            if (isset($value) || !empty($value)) {
+                switch ($key) {
+                    case 'product_id':
+                        $item->setSku($value);
+                        break;
+                    case 'price':
+                        $item->setUnitPrice($value);
+                        break;
+                    case 'product_name':
+                        $item->setProductName($value);
+                        break;
+                    default:
+                        $item->{$key} = $value;
+                        break;
+                }
+            }
+        }
+
+        return $item;
     }
 }

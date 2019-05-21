@@ -404,11 +404,9 @@ class ProductModel implements \JsonSerializable
         $product = new self();
 
         foreach (json_decode($json, true) as $key => $value) {
-            //if (isset($value) && !empty($value)) {
             if (in_array($key, array_keys(get_class_vars(get_class($product))))) {
                 $product->{$key} = $value;
             }
-            //}
         }
 
         return $product;

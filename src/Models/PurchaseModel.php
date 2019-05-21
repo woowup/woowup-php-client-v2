@@ -460,6 +460,64 @@ class PurchaseModel implements \JsonSerializable
         return $array;
     }
 
+    public static function createFromJson($json)
+    {
+        $purchase = new self();
+
+        foreach (get_object_vars($purchase) as $property => $value) {
+            if (!isset($purchase->{$property})) {
+                unset($purchase->{$property});
+            }
+        }
+
+        foreach (json_decode($json) as $key => $value) {
+            if (is_null($value)) {
+                continue;
+            }
+            switch ($key) {
+                case 'purchase_detail':
+                    foreach ($value->items as $purchaseItem) {
+                        $item = Item::createFromJson(json_encode($purchaseItem));
+                        $purchase->addItem($item);
+                    }
+                    break;
+                case 'prices':
+                    $prices = Prices::createFromJson(json_encode($value));
+                    $purchase->setPrices($prices);
+                    break;
+                case 'downloadtime':
+                    $purchase->setApprovedtime($value);
+                    break;
+                case 'branch':
+                    $purchase->setBranchName($value->name);
+                    break;
+                case 'payment':
+                    if (is_array($value)) {
+                        foreach ($value as $purchasePayment) {
+                            $payment = Payment::createFromJson(json_encode($purchasePayment));
+                            $purchase->addPayment($payment);
+                        }
+                    } else {
+                        $payment = Payment::createFromJson(json_encode($value));
+                        $purchase->addPayment($payment);
+                    }
+                    break;
+                case 'seller':
+                case 'purchase_operator':
+                    $seller = Seller::createFromJson(json_encode($value));
+                    $purchase->setSeller($seller);
+                    break;
+                default:
+                    if (isset($value) && !empty($value)) {
+                        $purchase->{$key} = $value;
+                    }
+                    break;
+            }
+        }
+
+        return $purchase;
+    }
+
     private function validateChannel($channel)
     {
         $validValues = [

@@ -23,6 +23,9 @@ class PurchasePaymentModel implements \JsonSerializable
 
     public function __construct()
     {
+        foreach (get_object_vars($this) as $key => $value) {
+            unset($this->{$key});
+        }
         return $this;
     }
 
@@ -149,6 +152,32 @@ class PurchasePaymentModel implements \JsonSerializable
         }
 
         return $array;
+    }
+
+    public function createFromJson($json)
+    {
+        $payment = new self();
+
+        foreach (json_decode($json, true) as $key => $value) {
+            switch ($key) {
+                case 'total':
+                    $payment->setTotal((float) $value);
+                    break;
+                case 'installments':
+                    $payment->setInstallments((int) $value);
+                    break;
+                case 'name':
+                    $payment->setBank($value);
+                    break;
+                default:
+                    if (in_array($key, array_keys(get_class_vars(get_class($payment))))) {
+                        $payment->{$key} = $value;
+                    }
+                    break;
+            }
+        }
+
+        return $payment;
     }
 
     private function validateType($type)
