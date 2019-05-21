@@ -44,4 +44,21 @@ class Purchases extends Endpoint
 
         throw new \Exception("Purchase is not valid", 1);
     }
+
+    public function find($invoiceNumber)
+    {
+        $response = $this->get($this->host . '/purchases', [
+            'invoice_number' => $invoiceNumber,
+        ]);
+
+        if ($response->getStatusCode() == Endpoint::HTTP_OK) {
+            $data = json_decode($response->getBody());
+
+            if (isset($data->payload)) {
+                return \WoowUpV2\Models\PurchaseModel::createFromJson(json_encode(array_shift($data->payload)));
+            }
+        }
+
+        return false;
+    }
 }
