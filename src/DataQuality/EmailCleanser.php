@@ -2,7 +2,7 @@
 
 namespace WoowUpV2\DataQuality;
 
-use Mailcheck\Mailcheck as Mailcheck;
+use WoowUpV2\Support\WoowUpMailcheck as Mailcheck;
 
 class EmailCleanser
 {
