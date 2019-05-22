@@ -2,6 +2,7 @@
 
 namespace WoowUpV2\Models;
 
+use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
 use WoowUpV2\Models\PurchaseItemModel as Item;
 use WoowUpV2\Models\PurchasePricesModel as Prices;
 use WoowUpV2\Models\PurchasePaymentModel as Payment;
@@ -32,8 +33,13 @@ class PurchaseModel implements \JsonSerializable
     private $approvedtime;
     private $metadata;
 
+    // Data cleanser
+    private $cleanser;
+
     public function __construct()
     {
+        $this->cleanser = new DataCleanser();
+
         return $this;
     }
 
@@ -157,11 +163,15 @@ class PurchaseModel implements \JsonSerializable
      */
     public function setServiceUid($service_uid)
     {
-        $this->service_uid = $service_uid;
+        if ((is_string($service_uid) && (strlen($service_uid) > 0)) || is_null($service_uid)) {
+            $this->service_uid = $service_uid;
 
-        $this->clearUserId();
+            $this->clearUserId();
 
-        return $this;
+            return $this;
+        }
+
+        throw new \Exception("service_uid can be null or string with at least 1 character long", 1);
     }
 
     /**
@@ -177,13 +187,22 @@ class PurchaseModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setEmail($email)
+    public function setEmail(string $email, $sanitize = true)
     {
-        $this->email = $email;
+        if ((is_string($email) && (strlen($email) > 0)) || is_null($email)) {
+            if ($sanitize) {
+                if (($email = $this->cleanser->email->sanitize($email)) === false) {
+                    throw new \Exception("Email sanitization failed", 1);
+                }
+            }
+            $this->email = $email;
 
-        $this->clearUserId();
+            $this->clearUserId();
 
-        return $this;
+            return $this;
+        }
+
+        throw new \Exception("email cannot be empty", 1);
     }
 
     /**
@@ -201,11 +220,15 @@ class PurchaseModel implements \JsonSerializable
      */
     public function setDocument($document)
     {
-        $this->document = $document;
+        if ((is_string($document) && (strlen($document) > 0)) || is_null($document)) {
+            $this->document = $document;
 
-        $this->clearUserId();
+            $this->clearUserId();
 
-        return $this;
+            return $this;
+        }
+
+        throw new \Exception("document cannot be empty", 1);
     }
 
     /**
