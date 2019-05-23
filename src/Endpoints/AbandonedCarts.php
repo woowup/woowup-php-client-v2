@@ -11,9 +11,13 @@ class AbandonedCarts extends Endpoint
         parent::__construct($host, $apikey);
     }
 
-    public function create($serviceUid, $cart)
+    public function create(\WoowUpV2\Models\AbandonedCartModel $cart)
     {
-        $response = $this->post($this->host . '/users/'.$this->encode($serviceUid).'/abandoned-cart', $cart);
+        if (!$cart->validate()) {
+            throw new \Exception("Abandoned Cart is not valid", 1);
+        }
+
+        $response = $this->post($this->host . '/multiusers/abandoned-cart', $cart);
 
         return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
     }
