@@ -160,7 +160,7 @@ class UserModel implements \JsonSerializable
         if ($email !== '') {
             if ($sanitize) {
                 if (($email = $this->cleanser->email->sanitize($email)) === false) {
-                    throw new \Exception("Email sanitization failed", 1);
+                    trigger_error("Email sanitization of $email failed", E_USER_WARNING);
                 }
             }
             $this->email = $email;
