@@ -107,6 +107,7 @@ class AbandonedCartModel implements \JsonSerializable
             if ($sanitize) {
                 if (($email = $this->cleanser->email->sanitize($email)) === false) {
                     trigger_error("Email sanitization of $email failed", E_USER_WARNING);
+                    $email = null;
                 }
             }
             $this->email = $email;
