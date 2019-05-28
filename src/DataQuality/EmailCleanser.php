@@ -35,7 +35,7 @@ class EmailCleanser
 
 	public function validate($email)
 	{
-		return ((filter_var($email, FILTER_VALIDATE_EMAIL) !== false) && (strpos($email, "@noemail.com") !== false));
+		return ((filter_var($email, FILTER_VALIDATE_EMAIL) !== false) && (strpos($email, "@noemail.com") === false));
 	}
 
 	public function prettify($email)
