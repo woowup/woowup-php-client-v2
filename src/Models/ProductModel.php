@@ -24,6 +24,7 @@ class ProductModel implements \JsonSerializable
     private $metadata;
     private $createtime;
     private $updatetime;
+    private $custom_attributes;
 
     public function __construct()
     {
@@ -342,6 +343,49 @@ class ProductModel implements \JsonSerializable
         $this->offer_price = $offer_price;
 
         return $this;
+    }
+
+    /**
+     * Get custom_attributes
+     * @return [type] [description]
+     */
+    public function getCustomAttributes()
+    {
+        return $this->custom_attributes;
+    }
+
+    /**
+     * Set custom_attributes
+     * @param array $custom_attributes [description]
+     */
+    public function setCustomAttributes($custom_attributes)
+    {
+        if (!is_array($custom_attributes) && !is_object($custom_attributes)) {
+            throw new \Exception("custom_attributes must be array or object", 1);
+        }
+
+        foreach ($custom_attributes as $key => $value) {
+            $this->addCustomAttribute($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a single custom attribute
+     * @param [type] $key   [description]
+     * @param [type] $value [description]
+     */
+    public function addCustomAttribute($key, $value)
+    {
+        if (!empty($key)) {
+            if (!isset($this->custom_attributes)) {
+                $this->custom_attributes = new \stdClass();
+            }
+            $this->custom_attributes->{$key} = $value;
+            return true;
+        }
+        throw new \Exception("Not valid key for custom_attribute", 1);
     }
 
     /**
