@@ -32,14 +32,14 @@ class Products extends Endpoint
             $data = json_decode($response->getBody());
 
             if (isset($data->payload)) {
-                return \WoowUp\Models\ProductModel::createFromJson(json_encode($data->payload));
+                return \WoowUpV2\Models\ProductModel::createFromJson(json_encode($data->payload));
             }
         }
 
         return false;
     }
 
-    public function create(\WoowUp\Models\ProductModel $product)
+    public function create(\WoowUpV2\Models\ProductModel $product)
     {
         if ($product->validate()) {
             $response = $this->post($this->host . '/products', $product);
@@ -50,7 +50,7 @@ class Products extends Endpoint
         throw new \Exception("Product is not valid", 1);
     }
 
-    public function update($sku, \WoowUp\Models\ProductModel $product)
+    public function update($sku, \WoowUpV2\Models\ProductModel $product)
     {
         if ($product->validate()) {
             $response = $this->put($this->host . '/products/' . $this->encode($sku), $product);
