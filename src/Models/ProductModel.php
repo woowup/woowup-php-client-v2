@@ -2,6 +2,7 @@
 
 namespace WoowUpV2\Models;
 
+use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
 use WoowUpV2\Models\CategoryModel;
 
 class ProductModel implements \JsonSerializable
@@ -26,11 +27,17 @@ class ProductModel implements \JsonSerializable
     private $updatetime;
     private $custom_attributes;
 
+    // data cleanser
+    protected $cleanser;
+
     public function __construct()
     {
         foreach (get_object_vars($this) as $key => $value) {
             unset($this->{$key});
         }
+
+        $this->cleanser = new DataCleanser();
+
         return $this;
     }
 
@@ -67,9 +74,9 @@ class ProductModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setName($name)
+    public function setName($name, $prettify = true)
     {
-        $this->name = $name;
+        $this->name = $prettify ? $this->cleanser->names->prettify($name) : $name;
 
         return $this;
     }
@@ -87,9 +94,9 @@ class ProductModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setBaseName($base_name)
+    public function setBaseName($base_name, $prettify = true)
     {
-        $this->base_name = $base_name;
+        $this->base_name = $prettify ? $this->cleanser->names->prettify($base_name) : $base_name;
 
         return $this;
     }
@@ -107,9 +114,9 @@ class ProductModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setBrand($brand)
+    public function setBrand($brand, $prettify = true)
     {
-        $this->brand = $brand;
+        $this->brand = $prettify ? $this->cleanser->names->prettify($brand) : $brand;
 
         return $this;
     }
@@ -276,13 +283,14 @@ class ProductModel implements \JsonSerializable
                 } elseif (is_string($c)) {
                     $this->category[] = $c;
                 } else {
-                    throw new \Exception("Category list must be an array of string or WoowUpV2\Models\CategoryModel", 1);
+                    trigger_error("Category list must be an array of string or CategoryModel", E_USER_WARNING);
                 }
             }
-
-            return $this;
+        } else {
+            trigger_error("Category list must be an array of CategoryModel", 1);
         }
-        throw new \Exception("Category list must be an array of CategoryModel", 1);
+
+        return $this;
     }
 
     /**
@@ -361,11 +369,11 @@ class ProductModel implements \JsonSerializable
     public function setCustomAttributes($custom_attributes)
     {
         if (!is_array($custom_attributes) && !is_object($custom_attributes)) {
-            throw new \Exception("custom_attributes must be array or object", 1);
-        }
-
-        foreach ($custom_attributes as $key => $value) {
-            $this->addCustomAttribute($key, $value);
+            trigger_error("Invalid custom_attributes", E_USER_WARNING);
+        } else {
+            foreach ($custom_attributes as $key => $value) {
+                $this->addCustomAttribute($key, $value);
+            }
         }
 
         return $this;
@@ -383,9 +391,11 @@ class ProductModel implements \JsonSerializable
                 $this->custom_attributes = new \stdClass();
             }
             $this->custom_attributes->{$key} = $value;
-            return true;
+        } else {
+            trigger_error("Not valid key for custom_attribute", E_USER_WARNING);
         }
-        throw new \Exception("Not valid key for custom_attribute", 1);
+
+        return $this;
     }
 
     /**
@@ -435,7 +445,7 @@ class ProductModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if (isset($value) && !empty($value)) {
+            if (isset($value) && !empty($value) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }

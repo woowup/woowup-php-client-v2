@@ -72,11 +72,11 @@ class UserEventModel implements \JsonSerializable
     {
     	if (!empty($event)) {
 	        $this->event = $event;
+	    } else {
+            trigger_error("Invalid event", E_USER_WARNING);
+        }
 
-	        return $this;
-	    }
-
-	    throw new \Exception("event cannot be empty", 1);
+        return $this;
     }
 
     /**
@@ -96,11 +96,11 @@ class UserEventModel implements \JsonSerializable
     {
         if ((is_string($service_uid) && (strlen($service_uid) > 0)) || is_null($service_uid)) {
             $this->service_uid = $service_uid;
-
-            return $this;
+        } else {
+            trigger_error("Invalid service_uid", E_USER_WARNING);
         }
 
-        throw new \Exception("service_uid can be null or string with at least 1 character long", 1);
+        return $this;
     }
 
     /**
@@ -126,11 +126,11 @@ class UserEventModel implements \JsonSerializable
                 }
             }
             $this->email = $email;
-
-            return $this;
+        } else {
+            trigger_error("Invalid email", E_USER_WARNING);
         }
 
-        throw new \Exception("email cannot be empty", 1);
+        return $this;
     }
 
     /**
@@ -150,11 +150,11 @@ class UserEventModel implements \JsonSerializable
     {
         if ((is_string($document) && (strlen($document) > 0)) || is_null($document)) {
             $this->document = $document;
-
-            return $this;
+        } else {
+            trigger_error("Invalid document", E_USER_WARNING);
         }
 
-        throw new \Exception("document cannot be empty", 1);
+        return $this;
     }
 
     /**

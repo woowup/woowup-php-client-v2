@@ -81,11 +81,11 @@ class AbandonedCartModel implements \JsonSerializable
     {
         if ((is_string($service_uid) && (strlen($service_uid) > 0)) || is_null($service_uid)) {
             $this->service_uid = $service_uid;
-
-            return $this;
+        } else {
+            trigger_error("Invalid service_uid", E_USER_WARNING);
         }
 
-        throw new \Exception("service_uid can be null or string with at least 1 character long", 1);
+        return $this;
     }
 
     /**
@@ -107,15 +107,15 @@ class AbandonedCartModel implements \JsonSerializable
             if ($sanitize) {
                 if (($email = $this->cleanser->email->sanitize($email)) === false) {
                     trigger_error("Email sanitization of $email failed", E_USER_WARNING);
-                    $email = null;
+                    return $this;
                 }
             }
             $this->email = $email;
-
-            return $this;
+        } else {
+            trigger_error("Invalid email", E_USER_WARNING);
         }
 
-        throw new \Exception("email cannot be empty", 1);
+        return $this;
     }
 
     /**
@@ -135,11 +135,11 @@ class AbandonedCartModel implements \JsonSerializable
     {
         if ((is_string($document) && (strlen($document) > 0)) || is_null($document)) {
             $this->document = $document;
-
-            return $this;
+        } else {
+            trigger_error("Invalid document", E_USER_WARNING);
         }
 
-        throw new \Exception("document cannot be empty", 1);
+        return $this;
     }
 
     /**
@@ -178,10 +178,10 @@ class AbandonedCartModel implements \JsonSerializable
     public function setExternalId(string $external_id)
     {
         if (empty($external_id)) {
-            throw new \Exception("external_id cannot be empty", 1);
+            trigger_error("external_id cannot be empty", E_USER_WARNING);
+        } else {
+            $this->external_id = $external_id;
         }
-
-        $this->external_id = $external_id;
 
         return $this;
     }
@@ -259,15 +259,29 @@ class AbandonedCartModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setProducts(array $products)
+    public function setProducts(array $products, $prettify = true)
     {
         if ($this->validateProducts($products)) {
             $this->products = $products;
-
-            return $this;
+        } else {
+            trigger_error("Invalid products", E_USER_WARNING);
         }
 
-        throw new \Exception("Invalid products", 1);
+        return $this;
+    }
+
+    public function addProduct($product)
+    {
+        if (is_array($product)) {
+            $product = (object) $product;
+        }
+        if (!isset($product->sku) || empty($product->sku)) {
+            trigger_error("Invalid product sku", E_USER_WARNING);
+        } else {
+            $this->products[] = $product;
+        }
+
+        return $this;
     }
 
     /**
@@ -294,7 +308,7 @@ class AbandonedCartModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if (isset($value)) {
+            if (isset($value) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }
@@ -326,14 +340,10 @@ class AbandonedCartModel implements \JsonSerializable
     {
         foreach ($products as $product) {
             if (is_array($product)) {
-                if (!isset($product['sku']) || empty($product['sku'])) {
-                    return false;
-                }
-            } elseif (is_object($product)) {
-                if (!isset($product->sku) || empty($product->sku)) {
-                    return false;
-                }
-            } else {
+                $product = (object) $product;
+            }
+            if (!isset($product->sku) || empty($product->sku)) {
+                trigger_error("Invalid sku for product", E_USER_WARNING);
                 return false;
             }
         }

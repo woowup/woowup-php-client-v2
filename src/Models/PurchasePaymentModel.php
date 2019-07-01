@@ -2,6 +2,8 @@
 
 namespace WoowUpV2\Models;
 
+use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
+
 /**
  *
  */
@@ -20,12 +22,17 @@ class PurchasePaymentModel implements \JsonSerializable
     private $total;
     private $installments;
 
+    // data-cleanser
+    private $cleanser;
 
     public function __construct()
     {
         foreach (get_object_vars($this) as $key => $value) {
             unset($this->{$key});
         }
+
+        $this->cleanser = new DataCleanser();
+
         return $this;
     }
 
@@ -75,9 +82,9 @@ class PurchasePaymentModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setBrand($brand)
+    public function setBrand($brand, $prettify = true)
     {
-        $this->brand = $brand;
+        $this->brand = $prettify ? $this->cleanser->names->prettify($brand) : $brand;
 
         return $this;
     }
@@ -95,9 +102,9 @@ class PurchasePaymentModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setBank($bank)
+    public function setBank($bank, $prettify = true)
     {
-        $this->bank = $bank;
+        $this->bank = $prettify ? $this->cleanser->names->prettify($bank) : $bank;
 
         return $this;
     }
@@ -146,7 +153,7 @@ class PurchasePaymentModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if ($value !== null) {
+            if (($value !== null) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }

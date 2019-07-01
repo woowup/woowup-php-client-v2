@@ -2,6 +2,8 @@
 
 namespace WoowUpV2\Models;
 
+use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
+
 /**
  *
  */
@@ -10,12 +12,17 @@ class SellerModel implements \JsonSerializable
     private $name;
     private $email;
     private $external_id;
+
+    // data-cleanser
+    private $cleanser;
     
     public function __construct()
     {
         foreach (get_object_vars($this) as $key => $value) {
             unset($this->{$key});
         }
+
+        $this->cleanser = new DataCleanser();
 
         return $this;
     }
@@ -46,9 +53,9 @@ class SellerModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setName($name)
+    public function setName($name, $prettify = true)
     {
-        $this->name = $name;
+        $this->name = $prettify ? $this->cleanser->names->prettify($name) : $name;
 
         return $this;
     }
@@ -66,9 +73,19 @@ class SellerModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setEmail($email)
+    public function setEmail($email, $sanitize = true)
     {
-        $this->email = $email;
+        if ($email !== '') {
+            if ($sanitize) {
+                if (($email = $this->cleanser->email->sanitize($email)) === false) {
+                    trigger_error("Email sanitization of $email failed", E_USER_WARNING);
+                    return $this;
+                }
+            }
+            $this->email = $email;
+        } else {
+            trigger_error("Invalid email", E_USER_WARNING);
+        }
 
         return $this;
     }
@@ -97,7 +114,7 @@ class SellerModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if ($value !== null) {
+            if (($value !== null) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }

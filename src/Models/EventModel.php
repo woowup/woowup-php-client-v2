@@ -46,11 +46,11 @@ class EventModel implements \JsonSerializable
     {
     	if (!empty($name)) {
 	        $this->name = $name;
+	    } else {
+            trigger_error("Invalid name", E_USER_WARNING);
+        }
 
-	        return $this;
-	    }
-
-	    throw new \Exception("name cannot be empty", 1);
+        return $this;
     }
 
     /**

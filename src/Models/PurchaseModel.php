@@ -103,27 +103,27 @@ class PurchaseModel implements \JsonSerializable
         if (method_exists($item, 'validate')) {
             if ($item->validate()) {
                 $this->purchase_detail[] = $item;
-
-                return $this;
             }
+        } else {
+            trigger_error("Invalid item", E_USER_WARNING);
         }
 
-        throw new \Exception("Item is not valid", 1);
+        return $this;
     }
 
     public function addPayment(Payment $payment)
     {
         if (!$payment->validate()) {
-            throw new \Exception("Payment is not valid", 1);
-        }
-
-        if (!isset($this->payment) || empty($this->payment)) {
-            $this->setPayment($payment);
+            trigger_error("Invalid payment", E_USER_WARNING);
         } else {
-            if (!is_array($this->payment)) {
-                $this->payment = array($this->payment);
+            if (!isset($this->payment) || empty($this->payment)) {
+                $this->setPayment($payment);
+            } else {
+                if (!is_array($this->payment)) {
+                    $this->payment = array($this->payment);
+                }
+                $this->payment[] = $payment;
             }
-            $this->payment[] = $payment;
         }
 
         return $this;
@@ -168,11 +168,11 @@ class PurchaseModel implements \JsonSerializable
             $this->service_uid = $service_uid;
 
             $this->clearUserId();
-
-            return $this;
+        } else {
+            trigger_error("Invalid service_uid", E_USER_WARNING);
         }
 
-        throw new \Exception("service_uid can be null or string with at least 1 character long", 1);
+        return $this;
     }
 
     /**
@@ -200,11 +200,11 @@ class PurchaseModel implements \JsonSerializable
             $this->email = $email;
 
             $this->clearUserId();
-
-            return $this;
+        } else {
+            trigger_error("Invalid email", E_USER_WARNING);
         }
 
-        throw new \Exception("email cannot be empty", 1);
+        return $this;
     }
 
     /**
@@ -226,11 +226,11 @@ class PurchaseModel implements \JsonSerializable
             $this->document = $document;
 
             $this->clearUserId();
-
-            return $this;
+        } else {
+            trigger_error("Invalid document", E_USER_WARNING);
         }
 
-        throw new \Exception("document cannot be empty", 1);
+        return $this;
     }
 
     /**
@@ -246,9 +246,9 @@ class PurchaseModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setTelephone($telephone)
+    public function setTelephone($telephone, $sanitize = true)
     {
-        $this->telephone = $telephone;
+        $this->telephone = $sanitize ? $this->cleanser->telephone->sanitize($telephone) : $telephone;
 
         $this->clearUserId();
 
@@ -292,11 +292,11 @@ class PurchaseModel implements \JsonSerializable
     {
         if ($this->validateChannel($channel)) {
             $this->channel = $channel;
-
-            return $this;
+        } else {
+            trigger_error("Invalid channel", E_USER_WARNING);
         }
 
-        throw new \Exception("$channel is not a valid channel", 1);
+        return $this;
     }
 
     /**
@@ -316,7 +316,8 @@ class PurchaseModel implements \JsonSerializable
     {
         foreach ($purchase_detail as $key => $item) {
             if (!is_a($item, 'WoowUpV2\Models\PurchaseItemModel') || !$item->validate()) {
-                throw new \Exception("Not valid item at index $key of purchase_detail", 1);
+                trigger_error("Not valid item at index $key of purchase_detail", E_USER_WARNING);
+                return $this;
             }
         }
 
@@ -362,11 +363,11 @@ class PurchaseModel implements \JsonSerializable
     {
         if ($this->validatePayment($payment)) {
             $this->payment = $payment;
-
-            return $this;
+        } else {
+            trigger_error("Invalid payment", E_USER_WARNING);
         }
 
-        throw new \Exception("Payment is not valid", 1);
+        return $this;
     }
 
     /**
@@ -382,9 +383,9 @@ class PurchaseModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setBranchName($branch_name)
+    public function setBranchName($branch_name, $prettify = true)
     {
-        $this->branch_name = $branch_name;
+        $this->branch_name = $prettify ? $this->cleanser->names->prettify($branch_name) : $branch_name;
 
         return $this;
     }
@@ -406,11 +407,11 @@ class PurchaseModel implements \JsonSerializable
     {
         if ($seller->validate()) {
             $this->seller = $seller;
-
-            return $this;
+        } else {
+            trigger_error("Invalid seller", E_USER_WARNING);
         }
 
-        throw new \Exception("Seller is not valid", 1);
+        return $this;
     }
 
     /**
@@ -489,11 +490,11 @@ class PurchaseModel implements \JsonSerializable
     public function setCustomAttributes($custom_attributes)
     {
         if (!is_array($custom_attributes) && !is_object($custom_attributes)) {
-            throw new \Exception("custom_attributes must be array or object", 1);
-        }
-
-        foreach ($custom_attributes as $key => $value) {
-            $this->addCustomAttribute($key, $value);
+            trigger_error("custom_attributes must be array or object", E_USER_WARNING);
+        } else {
+            foreach ($custom_attributes as $key => $value) {
+                $this->addCustomAttribute($key, $value);
+            }
         }
 
         return $this;
@@ -511,16 +512,18 @@ class PurchaseModel implements \JsonSerializable
                 $this->custom_attributes = new \stdClass();
             }
             $this->custom_attributes->{$key} = $value;
-            return true;
+        } else {
+            trigger_error("Invalid key for custom_attribute", E_USER_WARNING);
         }
-        throw new \Exception("Not valid key for custom_attribute", 1);
+
+        return $this;
     }
 
     public function jsonSerialize()
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if (isset($value) && !empty($value)) {
+            if (isset($value) && !empty($value) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }

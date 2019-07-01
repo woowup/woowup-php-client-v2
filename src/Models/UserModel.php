@@ -109,11 +109,11 @@ class UserModel implements \JsonSerializable
             $this->service_uid = $service_uid;
 
             $this->clearUserId();
-
-            return $this;
+        } else {
+            trigger_error("Invalid service_uid", E_USER_WARNING);
         }
 
-        throw new \Exception("service_uid can be null or string with at least 1 character long", 1);
+        return $this;
     }
 
     /**
@@ -135,11 +135,11 @@ class UserModel implements \JsonSerializable
             $this->document = $document;
 
             $this->clearUserId();
-
-            return $this;
+        } else {
+            trigger_error("Invalid document", E_USER_WARNING);
         }
 
-        throw new \Exception("document cannot be empty", 1);
+        return $this;
     }
 
     /**
@@ -161,17 +161,17 @@ class UserModel implements \JsonSerializable
             if ($sanitize) {
                 if (($email = $this->cleanser->email->sanitize($email)) === false) {
                     trigger_error("Email sanitization of $email failed", E_USER_WARNING);
-                    $email = null;
+                    return $this;
                 }
             }
             $this->email = $email;
 
             $this->clearUserId();
-
-            return $this;
+        } else {
+            trigger_error("Invalid email", E_USER_WARNING);
         }
 
-        throw new \Exception("email cannot be empty", 1);
+        return $this;
     }
 
     /**
@@ -286,11 +286,11 @@ class UserModel implements \JsonSerializable
     {
         if (($gender === self::FEMALE_GENDER_VALUE) || ($gender === self::MALE_GENDER_VALUE)) {
             $this->gender = $gender;
-
-            return $this;
+        } else {
+            trigger_error("Invalid gender", E_USER_WARNING);
         }
 
-        throw new \Exception("Gender must be " . self::FEMALE_GENDER_VALUE . " or " . self::MALE_GENDER_VALUE, 1);
+        return $this;
     }
 
     /**
@@ -308,9 +308,9 @@ class UserModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setStreet(string $street)
+    public function setStreet(string $street, $prettify = true)
     {
-        $this->street = $street;
+        $this->street = $prettify ? $this->cleanser->names->prettify($street) : $street;
 
         return $this;
     }
@@ -352,9 +352,9 @@ class UserModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setCity(string $city)
+    public function setCity(string $city, $prettify = true)
     {
-        $this->city = $city;
+        $this->city = $prettify ? $this->cleanser->names->prettify($city) : $city;
 
         return $this;
     }
@@ -374,9 +374,9 @@ class UserModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setDepartment(string $department)
+    public function setDepartment(string $department, $prettify = true)
     {
-        $this->department = $department;
+        $this->department = $prettify ? $this->cleanser->names->prettify($department) : $department;
 
         return $this;
     }
@@ -396,9 +396,9 @@ class UserModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setState(string $state)
+    public function setState(string $state, $prettify = true)
     {
-        $this->state = $state;
+        $this->state = $prettify ? $this->cleanser->names->prettify($state) : $state;
 
         return $this;
     }
@@ -440,9 +440,9 @@ class UserModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setDocumentType(string $document_type)
+    public function setDocumentType(string $document_type, $prettify = true)
     {
-        $this->document_type = $document_type;
+        $this->document_type = $prettify ? $this->cleanser->names->prettify($document_type) : $prettify;
 
         return $this;
     }
@@ -466,11 +466,11 @@ class UserModel implements \JsonSerializable
     {
         if (in_array($marital_status, self::MARITAL_STATUS_VALUES)) {
             $this->marital_status = $marital_status;
-
-            return $this;
+        } else {
+            trigger_error("Invalid marital_status", E_USER_WARNING);
         }
 
-        throw new \Exception("Invalid value for marital_status. Must be one of the following: " . implode(', ', self::MARITAL_STATUS_VALUES), 1);
+        return $this;
     }
 
     /**
@@ -536,11 +536,11 @@ class UserModel implements \JsonSerializable
     {
         if (($mailing_enabled === self::ENABLED_VALUE) || ($mailing_enabled === self::DISABLED_VALUE)) {
             $this->mailing_enabled = $mailing_enabled;
-
-            return $this;
+        } else {
+            trigger_error("Invalid mailing_enabled", E_USER_WARNING);
         }
 
-        throw new \Exception("Field mailing_enabled can be either " . self::ENABLED_VALUE . " or " . self::DISABLED_VALUE, 1);
+        return $this;
     }
 
     /**
@@ -562,11 +562,11 @@ class UserModel implements \JsonSerializable
     {
         if (($sms_enabled === self::ENABLED_VALUE) || ($sms_enabled === self::DISABLED_VALUE)) {
             $this->sms_enabled = $sms_enabled;
-
-            return $this;
+        } else {
+            trigger_error("Invalid sms_enabled", E_USER_WARNING);
         }
 
-        throw new \Exception("Field sms_enabled can be either " . self::ENABLED_VALUE . " or " . self::DISABLED_VALUE, 1);
+        return $this;
     }
 
     /**
@@ -588,11 +588,11 @@ class UserModel implements \JsonSerializable
     {
         if (in_array($mailing_disabled_reason, self::DISABLED_REASON_VALUES)) {
             $this->mailing_disabled_reason = $mailing_disabled_reason;
-
-            return $this;
+        } else {
+            trigger_error("Invalid mailing_disabled_reason", E_USER_WARNING);
         }
 
-        throw new \Exception("Field mailing_disabled_reason must be one of the following: " . implode(', ', self::DISABLED_REASON_VALUES), 1);
+        return $this;
     }
 
     /**
@@ -614,11 +614,11 @@ class UserModel implements \JsonSerializable
     {
         if (in_array($sms_disabled_reason, self::DISABLED_REASON_VALUES)) {
             $this->sms_disabled_reason = $sms_disabled_reason;
-
-            return $this;
+        } else {
+            trigger_error("Invalid sms_disabled_reason", E_USER_WARNING);
         }
 
-        throw new \Exception("Field sms_disabled_reason must be one of the following: " . implode(', ', self::DISABLED_REASON_VALUES), 1);
+        return $this;
     }
 
     /**
@@ -637,11 +637,11 @@ class UserModel implements \JsonSerializable
     public function setCustomAttributes($custom_attributes)
     {
         if (!is_array($custom_attributes) && !is_object($custom_attributes)) {
-            throw new \Exception("custom_attributes must be array or object", 1);
-        }
-            
-        foreach ($custom_attributes as $key => $value) {
-            $this->addCustomAttribute($key, $value);
+            trigger_error("Invalid custom_attributes", E_USER_WARNING);
+        } else {
+            foreach ($custom_attributes as $key => $value) {
+                $this->addCustomAttribute($key, $value);
+            }
         }
 
         return $this;
@@ -659,9 +659,11 @@ class UserModel implements \JsonSerializable
                 $this->custom_attributes = new \stdClass();
             }
             $this->custom_attributes->{$key} = $value;
-            return true;
+        } else {
+            trigger_error("Invalid key for custom_attribute", E_USER_WARNING);
         }
-        throw new \Exception("Not valid key for custom_attribute", 1);
+
+        return $this;
     }
 
         /**
@@ -793,7 +795,7 @@ class UserModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if (($value !== null) || in_array($property, self::CAN_BE_NULL_FIELDS)) {
+            if ((($value !== null) || in_array($property, self::CAN_BE_NULL_FIELDS)) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }
@@ -840,7 +842,7 @@ class UserModel implements \JsonSerializable
                         $user->{$key} = $value;
                     } else {
                         if (!in_array($key, array_keys(get_class_vars(get_class($user))))) {
-                            throw new \Exception("$key not valid", 1);
+                            trigger_error("$key not valid", E_USER_WARNING);
                         }
                     }
                     break;

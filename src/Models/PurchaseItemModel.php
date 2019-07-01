@@ -16,21 +16,19 @@ class PurchaseItemModel extends WoowUpProduct
 
     public function __construct()
     {
-        parent::__construct();
         foreach (get_object_vars($this) as $key => $value) {
             unset($this->{$key});
         }
+
+        parent::__construct();
+        
         return $this;
     }
 
     public function validate()
     {
-        if (!parent::validate()) {
-            return false;
-        }
-
-        if (!isset($this->product_name) || empty($this->product_name)) {
-            throw new \Exception("Invalid product " . $this->sku . ": invalid product_name", 1);
+        if (!$this->getSku()) {
+            throw new \Exception("Invalid product : invalid sku", 1);
             return false;
         }
 
@@ -60,10 +58,10 @@ class PurchaseItemModel extends WoowUpProduct
      *
      * @return self
      */
-    public function setProductName($product_name)
+    public function setProductName($product_name, $prettify = true)
     {
-        parent::setName($product_name);
-        $this->product_name = $product_name;
+        parent::setName($product_name, $prettify);
+        $this->product_name = $prettify ? $this->cleanser->names->prettify($product_name) : $product_name;
 
         return $this;
     }
@@ -192,7 +190,7 @@ class PurchaseItemModel extends WoowUpProduct
     {
         $array = parent::jsonSerialize();
         foreach (get_object_vars($this) as $property => $value) {
-            if (isset($value) && !empty($value)) {
+            if (isset($value) && !empty($value) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }

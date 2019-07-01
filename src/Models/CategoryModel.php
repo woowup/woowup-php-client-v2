@@ -2,6 +2,8 @@
 
 namespace WoowUpV2\Models;
 
+use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
+
 class CategoryModel implements \JsonSerializable
 {
     private $id;
@@ -9,8 +11,13 @@ class CategoryModel implements \JsonSerializable
     private $url;
     private $image_url;
 
+    // data cleanser
+    private $cleanser;
+
     public function __construct()
     {
+        $this->cleanser = new DataCleanser();
+
         return $this;
     }
 
@@ -47,9 +54,9 @@ class CategoryModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setName($name)
+    public function setName($name, $prettify = true)
     {
-        $this->name = $name;
+        $this->name = $prettify ? $this->cleanser->names->prettify($name) : $name;
 
         return $this;
     }
@@ -98,7 +105,7 @@ class CategoryModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if (isset($value) && !empty($value)) {
+            if (isset($value) && !empty($value) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }
