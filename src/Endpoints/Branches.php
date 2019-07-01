@@ -11,15 +11,23 @@ class Branches extends Endpoint
         parent::__construct($host, $apikey);
     }
 
-    public function update($branchName, $branch)
+    public function update($branchName, \WoowUpV2\Models\BranchModel $branch)
     {
+        if (!$branch->validate()) {
+            throw new \Exception("Branch is not valid", 1);
+        }
+
         $response = $this->put($this->host . '/branches/' . base64_encode($branchName), $branch);
 
         return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
     }
 
-    public function create($branch)
+    public function create(\WoowUpV2\Models\BranchModel $branch)
     {
+        if (!$branch->validate()) {
+            throw new \Exception("Branch is not valid", 1);
+        }
+
         $response = $this->post($this->host . '/branches', $branch);
 
         return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
@@ -33,7 +41,7 @@ class Branches extends Endpoint
             $data = json_decode($response->getBody());
 
             if (isset($data->payload)) {
-                return $data->payload;
+                return \WoowUpV2\Models\BranchModel::createFromJson(json_encode($data->payload));
             }
         }
 
@@ -51,11 +59,15 @@ class Branches extends Endpoint
             $data = json_decode($response->getBody());
 
             if (isset($data->payload)) {
-                return $data->payload;
+                $result = [];
+                foreach ($data->payload as $value) {
+                    $result[] = \WoowUpV2\Models\BranchModel::createFromJson(json_encode($value));
+                }
+
+                return $result;
             }
         }
 
         return false;
     }
-
 }
