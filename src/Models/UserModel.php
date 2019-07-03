@@ -3,6 +3,7 @@
 namespace WoowUpV2\Models;
 
 use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
+use WoowUpV2\Support\CountriesHelper as CountriesHelper;
 
 class UserModel implements \JsonSerializable
 {
@@ -76,6 +77,9 @@ class UserModel implements \JsonSerializable
     // Data cleanser
     private $cleanser;
 
+    // Countries
+    private $countriesHelper;
+
     /**
      * Constructor
      */
@@ -85,7 +89,8 @@ class UserModel implements \JsonSerializable
             unset($this->{$key});
         }
 
-        $this->cleanser = new DataCleanser();
+        $this->cleanser        = new DataCleanser();
+        $this->countriesHelper = new CountriesHelper();
 
         return $this;
     }
@@ -420,7 +425,17 @@ class UserModel implements \JsonSerializable
      */
     public function setCountry(string $country)
     {
-        $this->country = $country;
+        if (strlen($country) === 3) {
+            $code = strtoupper($country);
+        } elseif (strlen($country) === 2) {
+            $code = $this->countriesHelper->ISO2ToISO3($country);
+        } else {
+            $code = $this->countriesHelper->getISO3CodeByCountryName($country);
+        }
+
+        if ($code) {
+            $this->country = $code;
+        }
 
         return $this;
     }
@@ -795,7 +810,7 @@ class UserModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if ((($value !== null) || in_array($property, self::CAN_BE_NULL_FIELDS)) && ($property !== 'cleanser')) {
+            if ((($value !== null) || in_array($property, self::CAN_BE_NULL_FIELDS)) && ($property !== 'cleanser') && ($property !== 'countriesHelper')) {
                 $array[$property] = $value;
             }
         }
