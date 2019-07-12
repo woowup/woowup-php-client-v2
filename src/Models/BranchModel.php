@@ -151,8 +151,6 @@ class BranchModel implements \JsonSerializable
                 }
             }
             $this->email = $email;
-
-            $this->clearUserId();
         } else {
             trigger_error("Invalid email", E_USER_WARNING);
         }
