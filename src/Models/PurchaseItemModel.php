@@ -33,12 +33,12 @@ class PurchaseItemModel extends WoowUpProduct
         }
 
         if (!isset($this->quantity) || empty($this->quantity)) {
-            throw new \Exception("Invalid product " . $this->sku . ": invalid quantity", 1);
+            throw new \Exception("Invalid product " . $this->getSku() . ": invalid quantity", 1);
             return false;
         }
 
         if (!isset($this->unit_price) || empty($this->unit_price)) {
-            throw new \Exception("Invalid product " . $this->sku . ": invalid unit_price", 1);
+            throw new \Exception("Invalid product " . $this->getSku() . ": invalid unit_price", 1);
             return false;
         }
 
