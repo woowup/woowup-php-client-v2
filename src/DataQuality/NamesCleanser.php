@@ -52,7 +52,7 @@ class NamesCleanser
 		return [
 			implode(' ', $splittedNames[self::FIRST_NAME_INDEX]), 
 			implode(' ', $splittedNames[self::LAST_NAME_INDEX]), 
-			($originalGender !== false) ? $originalGender : $lastGender
+			($originalGender !== false) ? $originalGender : (isset($lastGender) ? $lastGender : ''),
 		];
 	}
 
