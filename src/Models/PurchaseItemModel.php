@@ -32,12 +32,12 @@ class PurchaseItemModel extends WoowUpProduct
             return false;
         }
 
-        if (!isset($this->quantity) || empty($this->quantity)) {
+        if (!isset($this->quantity)) {
             throw new \Exception("Invalid product " . $this->getSku() . ": invalid quantity", 1);
             return false;
         }
 
-        if (!isset($this->unit_price) || empty($this->unit_price)) {
+        if (!isset($this->unit_price)) {
             throw new \Exception("Invalid product " . $this->getSku() . ": invalid unit_price", 1);
             return false;
         }
@@ -190,7 +190,7 @@ class PurchaseItemModel extends WoowUpProduct
     {
         $array = parent::jsonSerialize();
         foreach (get_object_vars($this) as $property => $value) {
-            if (isset($value) && !empty($value) && ($property !== 'cleanser')) {
+            if (isset($value) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }

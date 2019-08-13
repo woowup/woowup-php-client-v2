@@ -523,7 +523,7 @@ class PurchaseModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if (isset($value) && !empty($value) && ($property !== 'cleanser')) {
+            if (isset($value) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }
