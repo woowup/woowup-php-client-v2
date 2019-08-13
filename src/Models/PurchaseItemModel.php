@@ -190,7 +190,7 @@ class PurchaseItemModel extends WoowUpProduct
     {
         $array = parent::jsonSerialize();
         foreach (get_object_vars($this) as $property => $value) {
-            if (isset($value) && !empty($value) && ($property !== 'cleanser')) {
+            if (isset($value) && ($property !== 'cleanser')) {
                 $array[$property] = $value;
             }
         }

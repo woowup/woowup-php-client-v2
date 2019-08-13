@@ -157,7 +157,7 @@ class PurchasePricesModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if (isset($value) && !empty($value)) {
+            if (isset($value)) {
                 $array[$property] = $value;
             }
         }
