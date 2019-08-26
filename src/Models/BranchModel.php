@@ -36,7 +36,7 @@ class BranchModel implements \JsonSerializable
     private $branch_zone;
     private $holder;
     private $status;
-    private $country_code;
+    private $country;
     private $state;
     private $city;
     private $business_type;
@@ -318,7 +318,7 @@ class BranchModel implements \JsonSerializable
      */
     public function getCountryCode()
     {
-        return $this->country_code;
+        return (isset($this->country) && isset($this->country->code)) ? $this->country->code : null;
     }
 
     /**
@@ -328,7 +328,7 @@ class BranchModel implements \JsonSerializable
      */
     public function setCountryCode($country_code)
     {
-        $this->country_code = $country_code;
+        $this->country = (object) ['code' => $country_code];
 
         return $this;
     }
