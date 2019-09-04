@@ -19,7 +19,7 @@ $sales  = './ventas.csv';
 define('DUPLICATED_PURCHASE', 'duplicated_purchase_number');
 define('INTERNAL_ERROR', 'internal_error');
 
-$woowup   = new \WoowUp\Client($apikey);
+$woowup   = new \WoowUpV2\Client($apikey);
 $imported = [];
 
 /**
