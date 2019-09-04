@@ -830,7 +830,9 @@ class UserModel implements \JsonSerializable
                     }
                     break;
                 case 'birthday':
-                    $user->setBirthdate($value);
+                    if ($value) {
+                        $user->setBirthdate($value);
+                    }
                     break;
                 case 'postal_code':
                     if (isset($value)) {
@@ -850,6 +852,11 @@ class UserModel implements \JsonSerializable
                 case 'custom_attributes':
                     if (isset($value) && !empty($value)) {
                         $user->setCustomAttributes($value);
+                    }
+                    break;
+                case 'custom_form':
+                    if (isset($value) && !empty($value)) {
+                        $user->custom_form = $value;
                     }
                     break;
                 default:
