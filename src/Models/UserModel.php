@@ -549,7 +549,9 @@ class UserModel implements \JsonSerializable
      */
     public function setMailingEnabled($mailing_enabled)
     {
-        if (($mailing_enabled === self::ENABLED_VALUE) || ($mailing_enabled === self::DISABLED_VALUE)) {
+        if (is_bool($mailing_enabled)) {
+            $this->mailing_enabled = $mailing_enabled ? self::ENABLED_VALUE : self::DISABLED_VALUE;
+        } elseif (($mailing_enabled === self::ENABLED_VALUE) || ($mailing_enabled === self::DISABLED_VALUE)) {
             $this->mailing_enabled = $mailing_enabled;
         } else {
             trigger_error("Invalid mailing_enabled", E_USER_WARNING);
@@ -575,7 +577,9 @@ class UserModel implements \JsonSerializable
      */
     public function setSmsEnabled($sms_enabled)
     {
-        if (($sms_enabled === self::ENABLED_VALUE) || ($sms_enabled === self::DISABLED_VALUE)) {
+        if (is_bool($sms_enabled)) {
+            $this->sms_enabled = $sms_enabled ? self::ENABLED_VALUE : self::DISABLED_VALUE;
+        } elseif (($sms_enabled === self::ENABLED_VALUE) || ($sms_enabled === self::DISABLED_VALUE)) {
             $this->sms_enabled = $sms_enabled;
         } else {
             trigger_error("Invalid sms_enabled", E_USER_WARNING);
@@ -854,10 +858,16 @@ class UserModel implements \JsonSerializable
                         $user->setCustomAttributes($value);
                     }
                     break;
-                case 'custom_form':
+                case 'customform':
                     if (isset($value) && !empty($value)) {
                         $user->custom_form = $value;
                     }
+                    break;
+                case 'mailing_enabled':
+                    $user->setMailingEnabled($value);
+                    break;
+                case 'sms_enabled':
+                    $user->setSmsEnabled($value);
                     break;
                 default:
                     if (in_array($key, array_keys(get_class_vars(get_class($user)))) && (isset($value) || in_array($key, self::CAN_BE_NULL_FIELDS))) {
