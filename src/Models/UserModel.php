@@ -860,7 +860,7 @@ class UserModel implements \JsonSerializable
                     break;
                 case 'customform':
                     if (isset($value) && !empty($value)) {
-                        $user->custom_form = $value;
+                        $user->customform = $value;
                     }
                     break;
                 case 'mailing_enabled':
