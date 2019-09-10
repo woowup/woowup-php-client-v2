@@ -206,6 +206,7 @@ class PurchaseItemModel extends WoowUpProduct
             if (isset($value) || !empty($value)) {
                 switch ($key) {
                     case 'product_id':
+                    case 'sku':
                         $item->setSku($value);
                         break;
                     case 'price':
