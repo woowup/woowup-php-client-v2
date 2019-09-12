@@ -14,7 +14,7 @@ class Endpoint
     const HTTP_BAD_REQUEST      = 403;
     const HTTP_NOT_FOUND        = 404;
 
-    const MAX_ATTEMPTS = 5;
+    const MAX_ATTEMPTS = 25;
 
     protected static $retryResponses = [self::HTTP_TOO_MANY_REQUEST];
 
