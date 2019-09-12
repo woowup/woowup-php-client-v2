@@ -519,6 +519,18 @@ class PurchaseModel implements \JsonSerializable
         return $this;
     }
 
+    public function countUnits()
+    {
+        $count = 0;
+        if (isset($this->purchase_detail) && count($this->purchase_detail)) {
+            foreach ($this->purchase_detail as $item) {
+                $count += $item->getQuantity();
+            }
+        }
+
+        return $count;
+    }
+
     public function jsonSerialize()
     {
         $array = [];
