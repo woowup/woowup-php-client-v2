@@ -236,7 +236,7 @@ class UserModel implements \JsonSerializable
      */
     public function getTelephone()
     {
-        return $this->telephone;
+        return isset($this->telephone) ? $this->telephone : null;
     }
 
     /**
