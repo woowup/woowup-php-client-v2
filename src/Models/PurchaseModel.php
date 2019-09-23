@@ -562,7 +562,6 @@ class PurchaseModel implements \JsonSerializable
                     $items = (isset($value->items) ? $value->items : $value);
                     foreach ($items as $purchaseItem) {
                         $item = Item::createFromJson(json_encode($purchaseItem));
-                        var_dump($item->getSku());
                         $purchase->addItem($item);
                     }
                     break;
