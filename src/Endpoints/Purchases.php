@@ -54,7 +54,7 @@ class Purchases extends Endpoint
         if ($response->getStatusCode() == Endpoint::HTTP_OK) {
             $data = json_decode($response->getBody());
 
-            if (isset($data->payload)) {
+            if (isset($data->payload) && !empty($data->payload)) {
                 return \WoowUpV2\Models\PurchaseModel::createFromJson(json_encode(array_shift($data->payload)));
             }
         }
