@@ -11,6 +11,7 @@ use WoowUpV2\Endpoints\UserEvents;
 use WoowUpV2\Endpoints\Users;
 use WoowUpV2\Endpoints\Account;
 use WoowUpV2\Endpoints\Multiusers;
+use WoowUpV2\Endpoints\Stats;
 
 class Client
 {
@@ -71,6 +72,12 @@ class Client
     public $blacklist;
 
     /**
+     * Integration stats endpoint wrapper
+     * @var  WoowUpV2\Endpoints\Stats
+     */
+    public $stats;
+
+    /**
      * Client constructor
      * @param string $apikey Account's apikey
      * @param string $host   WoowUp API host
@@ -89,5 +96,6 @@ class Client
         $this->branches       = new Branches($url, $apikey);
         $this->account        = new Account($url, $apikey);
         $this->blacklist      = new Blacklist($url, $apikey);
+        $this->stats          = new Stats($url, $apikey);
     }
 }
