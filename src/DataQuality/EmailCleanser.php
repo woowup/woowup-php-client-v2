@@ -16,7 +16,7 @@ class EmailCleanser
 
 	public function sanitize($email)
 	{
-		$mailcheck = new Mailcheck();
+		/*$mailcheck = new Mailcheck();
 		$mailcheck->setPopularTlds($this->buildPopularTlds());
 
 		$email = self::prettify($email);
@@ -30,7 +30,9 @@ class EmailCleanser
 			}
 		}
 
-		return false;
+		return false;*/
+
+		return self::prettify($email);
 	}
 
 	public function validate($email)
