@@ -61,4 +61,24 @@ class Purchases extends Endpoint
 
         return false;
     }
+
+    public function findPayment($firstSixDigits)
+    {
+        $response = $this->get($this->host . '/purchases/iin/' . $firstSixDigits, []);
+
+        if ($response->getStatusCode() == Endpoint::HTTP_OK) {
+            $data = json_decode($response->getBody());
+
+            if (isset($data->payload) || !empty($data->payload)) {
+                $payment = new \WoowUpV2\Models\PurchasePaymentModel();
+                $payment->setType($data->payload->type);
+                $payment->setBrand($data->payload->brand);
+                $payment->setBank($data->payload->bank->name);
+
+                return $payment;
+            }
+        }
+
+        return false;
+    }
 }
