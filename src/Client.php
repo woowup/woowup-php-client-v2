@@ -4,6 +4,7 @@ namespace WoowUpV2;
 use WoowUpV2\Endpoints\AbandonedCarts;
 use WoowUpV2\Endpoints\Blacklist;
 use WoowUpV2\Endpoints\Branches;
+use WoowUpV2\Endpoints\CustomAttributes;
 use WoowUpV2\Endpoints\Events;
 use WoowUpV2\Endpoints\Products;
 use WoowUpV2\Endpoints\Purchases;
@@ -58,7 +59,12 @@ class Client
      * @var WoowUpV2\Endpoints\Branches
      */
     public $branches;
-  
+
+    /**
+     * CustomAttributes endpoint wrapper
+     * @var WoowUpV2\Endpoints\CustomAttributes
+     */
+    public $customAttributes;
     /**
      * Account endpoint wrapper
      * @var WoowUpV2\Endpoints\Account
@@ -87,15 +93,16 @@ class Client
     {
         $url = $host . '/' . $version;
 
-        $this->purchases      = new Purchases($url, $apikey);
-        $this->users          = new Users($url, $apikey);
-        $this->products       = new Products($url, $apikey);
-        $this->abandonedCarts = new AbandonedCarts($url, $apikey);
-        $this->events         = new Events($url, $apikey);
-        $this->userEvents     = new UserEvents($url, $apikey);
-        $this->branches       = new Branches($url, $apikey);
-        $this->account        = new Account($url, $apikey);
-        $this->blacklist      = new Blacklist($url, $apikey);
-        $this->stats          = new Stats($url, $apikey);
+        $this->purchases        = new Purchases($url, $apikey);
+        $this->users            = new Users($url, $apikey);
+        $this->products         = new Products($url, $apikey);
+        $this->abandonedCarts   = new AbandonedCarts($url, $apikey);
+        $this->customAttributes = new CustomAttributes($url, $apikey);
+        $this->events           = new Events($url, $apikey);
+        $this->userEvents       = new UserEvents($url, $apikey);
+        $this->branches         = new Branches($url, $apikey);
+        $this->account          = new Account($url, $apikey);
+        $this->blacklist        = new Blacklist($url, $apikey);
+        $this->stats            = new Stats($url, $apikey);
     }
 }
