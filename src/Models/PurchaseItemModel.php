@@ -215,6 +215,9 @@ class PurchaseItemModel extends WoowUpProduct
                     case 'product_name':
                         $item->setProductName($value);
                         break;
+                    case 'custom_attributes':
+                        $item->setCustomAttributes($value);
+                        break;
                     default:
                         $item->{$key} = $value;
                         break;
