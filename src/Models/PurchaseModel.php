@@ -94,7 +94,11 @@ class PurchaseModel implements \JsonSerializable
             return true;
         }
 
-        throw new \Exception("Invalid purchase " . $this->invoice_number . ": at least service_uid, document or email must be specified", 1);
+        if (isset($this->telephone) && !empty($this->telephone)) {
+            return true;
+        }
+
+        throw new \Exception("Invalid purchase " . $this->invoice_number . ": at least service_uid, document, telephone or email must be specified", 1);
         return false;
     }
 

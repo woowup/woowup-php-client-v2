@@ -9,7 +9,7 @@ class UserModel implements \JsonSerializable
 {
     const FEMALE_GENDER_VALUE = 'F';
     const MALE_GENDER_VALUE = 'M';
-    
+
     const MARITAL_STATUS_VALUES = [
         'single',
         'commited',
@@ -791,8 +791,11 @@ class UserModel implements \JsonSerializable
         if (isset($this->email) && !empty($this->email)) {
             return true;
         }
+        if (isset($this->telephone) && !empty($this->telephone)) {
+            return true;
+        }
 
-        throw new \Exception("Invalid user: at least service_uid, document or email must be specified", 1);
+        throw new \Exception("Invalid user: at least service_uid, document, telephone or email must be specified", 1);
 
         return false;
     }
