@@ -34,12 +34,30 @@ class Purchases extends Endpoint
         throw new \Exception("Purchase is not valid", 1);
     }
 
+    public function createAsync(\WoowUpV2\Models\PurchaseModel $purchase)
+    {
+        if ($purchase->validate()) {
+            return $this->postAsync($this->host.'/purchases', $purchase);
+        }
+
+        throw new \Exception("Purchase is not valid", 1);
+    }
+
     public function update(\WoowUpV2\Models\PurchaseModel $purchase)
     {
         if ($purchase->validate()) {
             $response = $this->put($this->host.'/purchases', $purchase);
 
             return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
+        }
+
+        throw new \Exception("Purchase is not valid", 1);
+    }
+
+    public function updateAsync(\WoowUpV2\Models\PurchaseModel $purchase)
+    {
+        if ($purchase->validate()) {
+            return $this->putAsync($this->host.'/purchases', $purchase);
         }
 
         throw new \Exception("Purchase is not valid", 1);

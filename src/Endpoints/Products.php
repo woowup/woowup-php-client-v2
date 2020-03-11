@@ -24,6 +24,11 @@ class Products extends Endpoint
         return false;
     }
 
+    public function existAsync($sku) // returns promise
+    {
+        return $this->getAsync($this->host . '/products/' . $this->encode($sku) . '/exist', []);
+    }
+
     public function find($sku)
     {
         $response = $this->get($this->host . '/products/' . $this->encode($sku), []);
@@ -50,6 +55,15 @@ class Products extends Endpoint
         throw new \Exception("Product is not valid", 1);
     }
 
+    public function createAsync(\WoowUpV2\Models\ProductModel $product)
+    {
+        if ($product->validate()) {
+            return $this->postAsync($this->host . '/products', $product);
+        }
+
+        throw new \Exception("Product is not valid", 1);
+    }
+
     public function update($sku, \WoowUpV2\Models\ProductModel $product)
     {
         if ($product->validate()) {
@@ -62,6 +76,15 @@ class Products extends Endpoint
             }
 
             return false;
+        }
+
+        throw new \Exception("Product is not valid", 1);
+    }
+
+    public function updateAsync($sku, \WoowUpV2\Models\ProductModel $product) // returns promise
+    {
+        if ($product->validate()) {
+            return $this->putAsync($this->host . '/products/' . $this->encode($sku), $product);
         }
 
         throw new \Exception("Product is not valid", 1);

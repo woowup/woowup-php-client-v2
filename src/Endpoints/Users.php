@@ -28,6 +28,15 @@ class Users extends Endpoint
         return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
     }
 
+    public function updateAsync(\WoowUpV2\Models\UserModel $user)
+    {
+        if (!$user->validate()) {
+            throw new \Exception("User is not valid", 1);
+        }
+
+        return $this->putAsync($this->host . '/multiusers', $user);
+    }
+
     public function create(\WoowUpV2\Models\UserModel $user)
     {
         if (!$user->validate()) {
@@ -37,6 +46,15 @@ class Users extends Endpoint
         $response = $this->post($this->host . '/users', $user);
 
         return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
+    }
+
+    public function createAsync(\WoowUpV2\Models\UserModel $user)
+    {
+        if (!$user->validate()) {
+            throw new \Exception("User is not valid", 1);
+        }
+
+        return $this->postAsync($this->host . '/users', $user);
     }
 
     public function exist($identity)
@@ -52,6 +70,13 @@ class Users extends Endpoint
         }
 
         return false;
+    }
+
+    public function existAsync($identity)
+    {
+        $identity = array_merge(self::$DEFAULT_IDENTITY, $identity);
+
+        return $this->getAsync($this->host . '/multiusers/exist', $identity);
     }
 
     protected function encode($uid)
