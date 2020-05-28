@@ -13,6 +13,7 @@ use WoowUpV2\Endpoints\Users;
 use WoowUpV2\Endpoints\Account;
 use WoowUpV2\Endpoints\Multiusers;
 use WoowUpV2\Endpoints\Stats;
+use WoowUpV2\Endpoints\Banks;
 
 class Client
 {
@@ -84,6 +85,10 @@ class Client
     public $stats;
 
     /**
+     * Integrations banks endpoint
+     */
+    public $banks;
+    /**
      * Client constructor
      * @param string $apikey Account's apikey
      * @param string $host   WoowUp API host
@@ -104,5 +109,6 @@ class Client
         $this->account          = new Account($url, $apikey);
         $this->blacklist        = new Blacklist($url, $apikey);
         $this->stats            = new Stats($url, $apikey);
+        $this->banks            = new Banks($url, $apikey);
     }
 }
