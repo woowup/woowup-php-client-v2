@@ -100,12 +100,14 @@ class Users extends Endpoint
         return false;
     }
 
-    public function search($page = 0, $limit = 25, $search = '')
+    public function search($page = 0, $limit = 25, $search = '', $include = '{}', $exclude = '{}')
     {
         $response = $this->get($this->host . '/users/', [
             'page'   => $page,
             'limit'  => $limit,
             'search' => $search,
+            'include' => $include,
+            'exclude' => $exclude,
         ]);
 
         if ($response->getStatusCode() == Endpoint::HTTP_OK) {
@@ -124,11 +126,13 @@ class Users extends Endpoint
         return false;
     }
 
-    public function getUserTransactions($identity, $concept = '')
+    public function getUserTransactions($identity, $concept = '', $from = '', $to = '')
     {
         $identity = array_merge(self::$DEFAULT_IDENTITY, $identity);
         $params   = array_merge($identity, [
             'concept' => $concept,
+            'from'    => $from,
+            'to'      => $to,
         ]);
 
         $response = $this->get($this->host . '/multiusers/transactions', $params);
