@@ -17,5 +17,6 @@ class Segments extends Endpoint
 
             return $data->payload;
         }
+        return false;
     }
 }
