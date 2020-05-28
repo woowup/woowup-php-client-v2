@@ -38,5 +38,16 @@ class CustomAttributes extends Endpoint
     	return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
 
     }
+
+    public function create(\WoowUpV2\Models\CustomAttributeModel $customAttribute, $entity)
+    {
+        if ($customAttribute->validate()) {
+            $response = $this->post($this->host.'/account/'.self::ENTITIES[$entity], $customAttribute);
+
+            return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
+        }
+
+        throw new \Exception("Custom Attribute is not valid", 1);
+    }
 }
 

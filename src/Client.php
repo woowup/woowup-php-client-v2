@@ -14,6 +14,7 @@ use WoowUpV2\Endpoints\Account;
 use WoowUpV2\Endpoints\Multiusers;
 use WoowUpV2\Endpoints\Stats;
 use WoowUpV2\Endpoints\Banks;
+use WoowUpV2\Endpoints\Segments;
 
 class Client
 {
@@ -88,6 +89,12 @@ class Client
      * Integrations banks endpoint
      */
     public $banks;
+
+     * Segments endpoint wrapper
+     * @var  WoowUpV2\Endpoints\Segments
+     */
+    public $segments;
+
     /**
      * Client constructor
      * @param string $apikey Account's apikey
@@ -110,5 +117,6 @@ class Client
         $this->blacklist        = new Blacklist($url, $apikey);
         $this->stats            = new Stats($url, $apikey);
         $this->banks            = new Banks($url, $apikey);
+        $this->segments         = new Segments($url, $apikey);
     }
 }
