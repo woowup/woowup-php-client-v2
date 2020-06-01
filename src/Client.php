@@ -90,6 +90,7 @@ class Client
      */
     public $banks;
 
+    /**
      * Segments endpoint wrapper
      * @var  WoowUpV2\Endpoints\Segments
      */
