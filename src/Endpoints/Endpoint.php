@@ -22,11 +22,11 @@ class Endpoint
     protected $apikey;
     protected $http;
 
-    public function __construct($host, $apikey)
+    public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http)
     {
         $this->host   = $host;
         $this->apikey = $apikey;
-        $this->http   = new \GuzzleHttp\Client();
+        $this->http   = $http ?: new \GuzzleHttp\Client();
     }
 
     protected function get($url, $params = [])
