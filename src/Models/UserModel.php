@@ -40,6 +40,9 @@ class UserModel implements \JsonSerializable
     private $first_name;
     private $last_name;
     private $telephone;
+    private $whatsapp_phone;
+    private $whatsapp_validated;
+    private $whatsapp_id;
     private $birthdate;
     private $gender;
     private $street;
@@ -776,6 +779,42 @@ class UserModel implements \JsonSerializable
         return $this;
     }
 
+    public function getWhatsappPhone()
+    {
+        return $this->whatsapp_phone;
+    }
+
+    public function getWhatsappId()
+    {
+        return $this->whatsapp_id;
+    }
+
+    public function getWhatsappValidated()
+    {
+        return $this->whatsapp_validated;
+    }
+
+    public function setWhatsappPhone($whatsappPhone)
+    {
+        $this->whatsapp_phone = $whatsappPhone;
+
+        return $this;
+    }
+
+    public function setWhatsappId($whatsappId)
+    {
+        $this->whatsapp_id = $whatsappId;
+
+        return $this;
+    }
+
+    public function setWhatsappValidated($whatsappValidated)
+    {
+        $this->whatsapp_validated = $whatsappValidated;
+
+        return $this;
+    }
+
     /**
      * Checks if user has any valid id
      * @return boolean
@@ -871,6 +910,15 @@ class UserModel implements \JsonSerializable
                     break;
                 case 'sms_enabled':
                     $user->setSmsEnabled($value);
+                    break;
+                case 'whatsapp_phone':
+                    $user->setWhatsappPhone($value);
+                    break;
+                case 'whatsapp_id':
+                    $user->setWhatsappId($value);
+                    break;
+                case 'whatsapp_validated':
+                    $user->setWhatsappValidated($value);
                     break;
                 default:
                     if (in_array($key, array_keys(get_class_vars(get_class($user)))) && (isset($value) || in_array($key, self::CAN_BE_NULL_FIELDS))) {
