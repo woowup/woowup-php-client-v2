@@ -22,7 +22,7 @@ class Endpoint
     protected $apikey;
     protected $http;
 
-    public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http)
+    public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http = null)
     {
         $this->host   = $host;
         $this->apikey = $apikey;
