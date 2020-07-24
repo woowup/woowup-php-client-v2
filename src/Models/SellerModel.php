@@ -122,7 +122,7 @@ class SellerModel implements \JsonSerializable
         return $array;
     }
 
-    public function createFromJson($json)
+    public static function createFromJson($json)
     {
         $seller = new self();
 
