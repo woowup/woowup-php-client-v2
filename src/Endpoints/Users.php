@@ -100,7 +100,7 @@ class Users extends Endpoint
         return false;
     }
 
-    public function search($page = 0, $limit = 25, $search = '', $include = '{}', $exclude = '{}')
+    public function search($page = 0, $limit = 25, $search = '', $include = '{}', $exclude = '{}', $segmentId = '')
     {
         $response = $this->get($this->host . '/users/', [
             'page'   => $page,
@@ -108,6 +108,7 @@ class Users extends Endpoint
             'search' => $search,
             'include' => $include,
             'exclude' => $exclude,
+            'segment_id' => $segmentId,
         ]);
 
         if ($response->getStatusCode() == Endpoint::HTTP_OK) {
