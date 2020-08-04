@@ -649,7 +649,7 @@ class UserModel implements \JsonSerializable
      */
     public function getCustomAttributes()
     {
-        return $this->custom_attributes ?: [];
+        return isset($this->custom_attributes) ? $this->custom_attributes : [];
     }
 
     /**
