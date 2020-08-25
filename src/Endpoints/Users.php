@@ -161,4 +161,30 @@ class Users extends Endpoint
 
         return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
     }
+
+    public function createFamilyMember(\WoowUpV2\Models\FamilyMemberModel $member, $identity)
+    {
+        $identity = array_merge(self::$DEFAULT_IDENTITY, $identity);
+
+        if ($member->validate()) {
+            $response = $this->post($this->host.'/multiusers/members', $member, $identity);
+
+            return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
+        }
+
+        throw new \Exception("Family member is not valid", 1);
+    }
+
+    public function updateFamilyMember(\WoowUpV2\Models\FamilyMemberModel $member, $identity)
+    {
+        $identity = array_merge(self::$DEFAULT_IDENTITY, $identity);
+
+        if ($member->validate()) {
+            $response = $this->put($this->host.'/multiusers/members', $member, $identity);
+
+            return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
+        }
+
+        throw new \Exception("Family member is not valid", 1);
+    }
 }

@@ -51,9 +51,10 @@ class Endpoint
         ]);
     }
 
-    protected function post($url, $data)
+    protected function post($url, $data, $params = [])
     {
         return $this->request('POST', $url, [
+            'query'   => $params,
             'json'    => $data,
             'headers' => [
                 'Authorization' => 'Basic ' . $this->apikey,
@@ -108,9 +109,10 @@ class Endpoint
         ]);
     }
 
-    protected function put($url, $data)
+    protected function put($url, $data, $params = [])
     {
         return $this->request('PUT', $url, [
+            'query'   => $params,
             'json'    => $data,
             'headers' => [
                 'Authorization' => 'Basic ' . $this->apikey,
