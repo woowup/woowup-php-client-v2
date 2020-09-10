@@ -37,6 +37,7 @@ class UserModel implements \JsonSerializable
     private $service_uid;
     private $document;
     private $email;
+    private $new_email;
     private $first_name;
     private $last_name;
     private $telephone;
@@ -175,6 +176,27 @@ class UserModel implements \JsonSerializable
             $this->email = $email;
 
             $this->clearUserId();
+        } else {
+            trigger_error("Invalid email", E_USER_WARNING);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set no contact email
+     * @param string $new_email [description]
+     */
+    public function setNewEmail(string $email, $sanitize = true)
+    {
+        if ($email !== '') {
+            if ($sanitize) {
+                if (($email = $this->cleanser->email->sanitize($email)) === false) {
+                    trigger_error("Email sanitization of $email failed", E_USER_WARNING);
+                    return $this;
+                }
+            }
+            $this->new_email = $email;
         } else {
             trigger_error("Invalid email", E_USER_WARNING);
         }
