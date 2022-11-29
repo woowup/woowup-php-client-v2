@@ -11,11 +11,19 @@ class Banks extends Endpoint
         parent::__construct($host, $apikey);
     }
 
-    public function getDataFromFirstDigits(string $firstSixDigits)
+    public function getDataFromFirstSixDigits(string $firstSixDigits)
     {
         $response = $this->get($this->host . '/purchases/iin/'.$firstSixDigits);
+        if ($response->getStatusCode() != Endpoint::HTTP_OK) {
+            return null;
+        }
 
-        return $response->getStatusCode() == Endpoint::HTTP_OK ? $response->getBody() : null;
+        $data = json_decode($response->getBody());
+        if (!isset($data->payload)) {
+            return null;
+        }
+
+        return $data->payload;
     }
 
     public function getDataFromFirstDigitsAsync(string $firstSixDigits)
