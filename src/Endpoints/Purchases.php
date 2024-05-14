@@ -63,11 +63,11 @@ class Purchases extends Endpoint
         throw new \Exception("Purchase is not valid", 1);
     }
 
-    public function find($invoiceNumber)
+    public function find($invoiceNumber, $params = [])
     {
-        $response = $this->get($this->host . '/purchases', [
+        $response = $this->get($this->host . '/purchases', array_merge([
             'invoice_number' => $invoiceNumber,
-        ]);
+        ], $params));
 
         if ($response->getStatusCode() == Endpoint::HTTP_OK) {
             $data = json_decode($response->getBody());
