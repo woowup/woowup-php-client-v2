@@ -65,9 +65,11 @@ class Purchases extends Endpoint
 
     public function find($invoiceNumber, $params = [])
     {
-        $response = $this->get($this->host . '/purchases', array_merge([
+        $params = array_merge([
             'invoice_number' => $invoiceNumber,
-        ], $params));
+        ], $params);
+
+        $response = $this->get($this->host . '/purchases', $params);
 
         if ($response->getStatusCode() == Endpoint::HTTP_OK) {
             $data = json_decode($response->getBody());
