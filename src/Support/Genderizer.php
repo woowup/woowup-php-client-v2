@@ -4,8 +4,10 @@ namespace WoowUpV2\Support;
 
 class Genderizer {
 	const API_URL = 'https://genderize.woowup.com/';
+    const ENDPOINT_CUSTOMER = 'customer';
 	const PROBABILITY_THRESHOLD = 0.75;
     const COUNT_THRESHOLD = 10;
+    const UNKNOWN_GENDER = 'unknown';
 
 	public function __construct()
 	{
@@ -14,25 +16,32 @@ class Genderizer {
 
 	public function getGender($name)
 	{
-		$parts = explode(' ', $name);
-		if (count($parts) > 1) { // Si el nombre es compuesto pruebo con el primer nombre
-			$name = array_shift($parts);
-		}
+		$firstName = $this->extractFirstName($name);
 
-		$response = $this->genderize(urlencode($name));
+		$response = $this->genderize(urlencode($firstName));
 
-        if (isset($response->gender) && ($response->gender !== null) && ($response->probability >= self::PROBABILITY_THRESHOLD) && ($response->count >= self::COUNT_THRESHOLD)) {
-            return ($response->gender === "male") ? "M" : "F";
-        } else {
+        if(!$response || (isset($response->gender) && $response->gender == self::UNKNOWN_GENDER)) {
             return false;
         }
+
+        if ($this->isResponseValid($response)) {
+            return ($response->gender === "male") ? "M" : "F";
+        }
+
+        return false;
 	}
 
-	protected function genderize($name)
-	{
-		$curl = curl_init();
+    protected function extractFirstName($name)
+    {
+        $parts = explode(' ', $name); // Si el nombre es compuesto pruebo con el primer nombre
+        return count($parts) > 1 ? array_shift($parts) : $name;
+    }
 
-        $url = self::API_URL . "?name=$name";
+    protected function genderize($name)
+    {
+        $curl = curl_init();
+
+        $url = self::API_URL. self::ENDPOINT_CUSTOMER . "?first_name=$name";
 
         if (isset($_ENV['genderizeApikey']) && !is_null($_ENV['genderizeApikey'])) {
             $url .= "&apikey=" . $_ENV['genderizeApikey'];
@@ -54,11 +63,18 @@ class Genderizer {
 
         curl_close($curl);
 
-        if ($err) {
-            echo "cURL Error #:" . $err;
+        if (!empty($err) || (!empty($response) && isset(json_decode($response)->error))) {
+            $err = !empty($err) ? $err : json_decode($response)->error;
+            echo "[GENDERIZER]: cURL Error #:" . $err;
+            return false;
         } else {
             $response = json_decode($response);
             return $response;
         }
-	}
+    }
+
+    protected function isResponseValid($response)
+    {
+        return ($response->probability >= self::PROBABILITY_THRESHOLD) && ($response->count >= self::COUNT_THRESHOLD);
+    }
 }
