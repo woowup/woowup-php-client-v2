@@ -3,78 +3,92 @@
 namespace WoowUpV2\Support;
 
 class Genderizer {
-	const API_URL = 'https://genderize.woowup.com/';
-    const ENDPOINT_CUSTOMER = 'customer';
+	const API_URL = 'https://genderize.woowup.com/customer';
 	const PROBABILITY_THRESHOLD = 0.75;
     const COUNT_THRESHOLD = 10;
     const UNKNOWN_GENDER = 'unknown';
+    private $cache = [];
 
 	public function __construct()
 	{
 		return $this;
 	}
 
-	public function getGender($name)
-	{
-		$firstName = $this->extractFirstName($name);
+    public function getGender($name)
+    {
+        $firstName = $this->extractFirstName($name);
 
-		$response = $this->genderize(urlencode($firstName));
-
-        if(!$response || (isset($response->gender) && $response->gender == self::UNKNOWN_GENDER)) {
-            return false;
-        }
-
-        if ($this->isResponseValid($response)) {
-            return ($response->gender === "male") ? "M" : "F";
-        }
-
-        return false;
-	}
+        return $this->cache[$firstName] ?? $this->fetchGender($firstName);
+    }
 
     protected function extractFirstName($name)
     {
-        $parts = explode(' ', $name); // Si el nombre es compuesto pruebo con el primer nombre
-        return count($parts) > 1 ? array_shift($parts) : $name;
+        return preg_replace("/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/u", "", strtok($name, ' '));
     }
 
-    protected function genderize($name)
+    private function fetchGender($firstName)
+    {
+        $url = self::API_URL . "?first_name=" . urlencode($firstName);
+        $url .= !empty($_ENV['genderizeApikey']) ? "&apikey=" . $_ENV['genderizeApikey'] : '';
+
+        $response = $this->makeCurlRequest($url);
+
+        if ($response && $this->isValidResponse($response)) {
+            $gender = ($response->gender === "male") ? "M" : "F";
+            $this->cache[$firstName] = $gender;
+            return $gender;
+        }
+
+        return false;
+    }
+
+    private function makeCurlRequest($url)
     {
         $curl = curl_init();
 
-        $url = self::API_URL. self::ENDPOINT_CUSTOMER . "?first_name=$name";
-
-        if (isset($_ENV['genderizeApikey']) && !is_null($_ENV['genderizeApikey'])) {
-            $url .= "&apikey=" . $_ENV['genderizeApikey'];
-        }
-
-        curl_setopt_array($curl, array(
+        curl_setopt_array($curl, [
             CURLOPT_URL            => $url,
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST  => "GET",
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER     => array(
+            CURLOPT_HTTPHEADER     => [
                 "Accept: application/json",
                 "Content-Type: application/json",
-            ),
-        ));
+            ],
+        ]);
 
         $response = curl_exec($curl);
-        $err      = curl_error($curl);
+        $error    = curl_error($curl);
 
         curl_close($curl);
 
-        if (!empty($err) || (!empty($response) && isset(json_decode($response)->error))) {
-            $err = !empty($err) ? $err : json_decode($response)->error;
-            echo "[GENDERIZER]: cURL Error #:" . $err;
+        if (!empty($error) || (!empty($response) && isset(json_decode($response)->error))) {
+            $error = !empty($error) ? $error : json_decode($response)->error;
+            echo "[GENDERIZER]: cURL Error #:" . $error;
             return false;
-        } else {
-            $response = json_decode($response);
-            return $response;
         }
+
+        return json_decode($response);
     }
 
-    protected function isResponseValid($response)
+    private function isValidResponse($response)
     {
-        return ($response->probability >= self::PROBABILITY_THRESHOLD) && ($response->count >= self::COUNT_THRESHOLD);
+        return isset($response->gender) &&
+            !$this->isUnknownGender($response) &&
+            $this->isValidProbability($response) &&
+            $this->isValidCount($response);
+    }
+
+    private function isUnknownGender($response)
+    {
+        return $response->gender === self::UNKNOWN_GENDER;
+    }
+
+    private function isValidProbability($response)
+    {
+        return isset($response->probability) && $response->probability >= self::PROBABILITY_THRESHOLD;
+    }
+
+    private function isValidCount($response)
+    {
+        return isset($response->count) && $response->count >= self::COUNT_THRESHOLD;
     }
 }
