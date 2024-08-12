@@ -2,11 +2,22 @@
 
 namespace WoowUpV2\Support;
 
+/**
+ * Genderizer Class
+ *
+ * This class uses the Genderize API to determine the gender
+ * of a person based on their first name.
+ */
 class Genderizer {
+    /** @var string Genderize API URL */
 	const API_URL = 'https://genderize.woowup.com/customer';
+    /** @var float Minimum probability threshold to consider the response as valid */
 	const PROBABILITY_THRESHOLD = 0.75;
+    /** @var int Minimum sample count threshold to consider the response as valid */
     const COUNT_THRESHOLD = 10;
+    /** @var string Default value when gender is not recognized */
     const UNKNOWN_GENDER = 'unknown';
+    /** @var array Cache to store query results */
     private $cache = [];
 
 	public function __construct()
@@ -14,6 +25,12 @@ class Genderizer {
 		return $this;
 	}
 
+    /**
+     * Get the gender based on the name.
+     *
+     * @param string $name Full name of the person.
+     * @return string|false Detected gender ('M' for male, 'F' for female) or false in case of error.
+     */
     public function getGender($name)
     {
         $firstName = $this->extractFirstName($name);
@@ -26,6 +43,12 @@ class Genderizer {
         return preg_replace("/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/u", "", strtok($name, ' '));
     }
 
+    /**
+     * Query the gender from the API.
+     *
+     * @param string $firstName First name to query.
+     * @return string|false Detected gender ('M' for male, 'F' for female) or false in case of error.
+     */
     private function fetchGender($firstName)
     {
         $url = self::API_URL . "?first_name=" . urlencode($firstName);
@@ -42,6 +65,12 @@ class Genderizer {
         return false;
     }
 
+    /**
+     * Perform a cURL request to the API.
+     *
+     * @param string $url URL of the request.
+     * @return object|false Decoded API response or false in case of error.
+     */
     private function makeCurlRequest($url)
     {
         $curl = curl_init();
@@ -69,6 +98,12 @@ class Genderizer {
         return json_decode($response);
     }
 
+    /**
+     * Check if the API response is valid.
+     *
+     * @param object $response Decoded API response.
+     * @return bool True if the response is valid, false otherwise.
+     */
     private function isValidResponse($response)
     {
         return isset($response->gender) &&
