@@ -695,6 +695,10 @@ class UserModel implements \JsonSerializable
         return $this;
     }
 
+    /**
+     * Get whatssap_disabled_reason
+     * @return mixed
+     */
     public function getWhatsappDisabledReason()
     {
         return $this->whatsapp_disabled_reason;
