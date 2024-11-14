@@ -58,8 +58,10 @@ class UserModel implements \JsonSerializable
     private $points;
     private $mailing_enabled;
     private $sms_enabled;
+    private $whatsapp_enabled;
     private $mailing_disabled_reason;
     private $sms_disabled_reason;
+    private $whatsapp_disabled_reason;
     private $custom_attributes;
     private $club_inscription_date;
 
@@ -614,6 +616,34 @@ class UserModel implements \JsonSerializable
     }
 
     /**
+     * Get whatsapp_enabled
+     * @return mixed
+     */
+    public function getWhatsappEnabled()
+    {
+        return $this->whatsapp_enabled;
+    }
+
+    /**
+     * Set whatsapp_enabled
+     * @param mixed $whatsapp_enabled
+     *
+     * @return self
+     */
+    public function setWhatsappEnabled($whatsapp_enabled)
+    {
+        if (is_bool($whatsapp_enabled)) {
+            $this->whatsapp_enabled = $whatsapp_enabled ? self::ENABLED_VALUE : self::DISABLED_VALUE;
+        } elseif (($whatsapp_enabled === self::ENABLED_VALUE) || ($whatsapp_enabled === self::DISABLED_VALUE)) {
+            $this->whatsapp_enabled = $whatsapp_enabled;
+        } else {
+            trigger_error("Invalid whatsapp_enabled", E_USER_WARNING);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get mailing_disabled_reason
      * @return mixed
      */
@@ -660,6 +690,32 @@ class UserModel implements \JsonSerializable
             $this->sms_disabled_reason = $sms_disabled_reason;
         } else {
             trigger_error("Invalid sms_disabled_reason", E_USER_WARNING);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get whatssap_disabled_reason
+     * @return mixed
+     */
+    public function getWhatsappDisabledReason()
+    {
+        return $this->whatsapp_disabled_reason;
+    }
+
+    /**
+     * Set whatsapp_disabled_reason
+     * @param mixed $whatsapp_disabled_reason
+     *
+     * @return self
+     */
+    public function setWhatsappDisabledReason($whatsapp_disabled_reason)
+    {
+        if (in_array($whatsapp_disabled_reason, self::DISABLED_REASON_VALUES)) {
+            $this->whatsapp_disabled_reason = $whatsapp_disabled_reason;
+        } else {
+            trigger_error("Invalid whatsapp_disabled_reason", E_USER_WARNING);
         }
 
         return $this;
