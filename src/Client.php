@@ -102,7 +102,7 @@ class Client
      * @param string $host   WoowUp API host
      * @param string $version   WoowUp API version
      */
-    public function __construct($apikey, $host = 'https://api.woowup.com', $version = 'apiv3', $http = null, $appId = 0)
+    public function __construct($apikey, $host = 'https://api.woowup.com', $version = 'apiv3', $http = null, $appId = null)
     {
         $url = $host . '/' . $version;
 
