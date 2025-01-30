@@ -102,7 +102,7 @@ class Client
      * @param string $host   WoowUp API host
      * @param string $version   WoowUp API version
      */
-    public function __construct($apikey, $host = 'https://api.woowup.com', $version = 'apiv3', $http = null)
+    public function __construct($apikey, $host = 'https://api.woowup.com', $version = 'apiv3', $http = null, $appId = null)
     {
         $url = $host . '/' . $version;
 
@@ -114,7 +114,7 @@ class Client
         $this->events           = new Events($url, $apikey, $http);
         $this->userEvents       = new UserEvents($url, $apikey, $http);
         $this->branches         = new Branches($url, $apikey, $http);
-        $this->account          = new Account($url, $apikey, $http);
+        $this->account          = new Account($url, $apikey, $http, $appId);
         $this->blacklist        = new Blacklist($url, $apikey, $http);
         $this->stats            = new Stats($url, $apikey, $http);
         $this->banks            = new Banks($url, $apikey, $http);

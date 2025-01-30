@@ -6,9 +6,11 @@ namespace WoowUpV2\Endpoints;
  */
 class Account extends Endpoint
 {
-    public function __construct($host, $apikey)
+    protected $appId;
+    public function __construct($host, $apikey, $http = null, $appId = null)
     {
-        parent::__construct($host, $apikey);
+        parent::__construct($host, $apikey, $http);
+        $this->appId = $appId;
     }
 
     public function customAttributes()
@@ -20,5 +22,15 @@ class Account extends Endpoint
 
         	return $data->payload;
         }
+    }
+
+    public function getAppId()
+    {
+        return $this->appId;
+    }
+
+    public function getApiKey(): string
+    {
+        return $this->apikey;
     }
 }
