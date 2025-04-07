@@ -10,6 +10,7 @@ class Users extends Endpoint
         'document'    => '',
         'email'       => '',
         'service_uid' => '',
+        'telephone'   => ''
     ];
 
     public function __construct($host, $apikey)
