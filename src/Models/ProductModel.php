@@ -46,7 +46,7 @@ class ProductModel implements \JsonSerializable
      */
     public function getSku()
     {
-        return $this->sku;
+        return isset($this->sku) ? $this->sku : null;
     }
 
     /**
