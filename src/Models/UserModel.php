@@ -893,7 +893,7 @@ class UserModel implements \JsonSerializable
         return $this;
     }
 
-        public function setFamily($family)
+    public function setFamily($family)
     {
         $this->family = $family;
 
