@@ -893,6 +893,18 @@ class UserModel implements \JsonSerializable
         return $this;
     }
 
+    public function setFamily($family)
+    {
+        $this->family = $family;
+
+        return $this;
+    }
+
+    public function getFamily()
+    {
+        return $this->family ?? null;
+    }
+
     /**
      * Checks if user has any valid id
      * @return boolean
