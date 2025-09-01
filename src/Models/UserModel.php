@@ -34,6 +34,26 @@ class UserModel implements \JsonSerializable
         'birthdate',
     ];
 
+
+    const BLACKLISTED_EMAIL_PATTERNS = [
+        '*noreply@mercadolibre.com',
+        '*mail.mercadolibre.com',
+        "ct.vtex.com.br"
+    ];
+
+    const WHITELISTED_EMAIL_PATTERNS = [
+        '@gmail.com',
+        '@hotmail',
+        '@yahoo',
+        '@outlook',
+        '@live',
+        '@icloud',
+        '@msn',
+        '@protonmail.com'
+    ];
+
+    const REPLACEMENT_EMAIL = 'noemail@noemail.com';
+
     private $service_uid;
     private $document;
     private $email;
@@ -166,20 +186,47 @@ class UserModel implements \JsonSerializable
      * Set email
      * @param string $email [description]
      */
-    public function setEmail(string $email, $sanitize = true)
+    public function setEmail(string $email, $sanitize = false)
     {
-        if ($email !== '') {
-            if ($sanitize) {
+        if (empty($email)) {
+            return $this;
+        }
+
+        $email = trim($email);
+
+        if ($sanitize) {
+            if (self::isBlacklistedEmail($email)) {
+                $hasOnlyEmail = $this->hasOnlyEmail($email);
+                if ($hasOnlyEmail) {
+                    $this->setMailingEnabled('disabled');
+                    $this->setMailingDisabledReason('other');
+                } else {
+                    $this->email = self::REPLACEMENT_EMAIL;
+                }
+                $this->clearUserId();
+                return $this;
+            }
+
+            if (!self::isWhitelistedDomain($email)) {
+                self::addReviewEmailTag($this);
+            }
+
+            $validatedEmail = self::validateEmail($email);
+            $this->email = $validatedEmail ?? $email;
+
+            $this->clearUserId();
+        } else {
+            if ($email !== '') {
                 if (($email = $this->cleanser->email->sanitize($email)) === false) {
                     trigger_error("Email sanitization of $email failed", E_USER_WARNING);
                     return $this;
                 }
-            }
-            $this->email = $email;
+                $this->email = $email;
 
-            $this->clearUserId();
-        } else {
-            trigger_error("Invalid email", E_USER_WARNING);
+                $this->clearUserId();
+            } else {
+                trigger_error("Invalid email", E_USER_WARNING);
+            }
         }
 
         return $this;
@@ -1034,5 +1081,60 @@ class UserModel implements \JsonSerializable
         if (!isset($this->email) || empty($this->email)) {
             unset($this->email);
         }
+    }
+
+    public static function isBlacklistedEmail(string $email): bool
+    {
+        foreach (self::BLACKLISTED_EMAIL_PATTERNS as $pattern) {
+            if (fnmatch($pattern, strtolower($email))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if the email is valid. If it is valid, it returns true,
+     * otherwise it returns false.
+     *
+     * @param array $customer
+     * @return bool
+     */
+    public static function isWhitelistedDomain(string $email): bool
+    {
+        foreach (self::WHITELISTED_EMAIL_PATTERNS as $pattern) {
+            if (stripos($email, $pattern) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static function addReviewEmailTag(UserModel $user): UserModel
+    {
+        $tags = $user->getTags();
+        if (!empty($tags)) {
+            $user->setTags($tags . ',review_email');
+        } else {
+            $user->setTags('review_email');
+        }
+        return $user;
+    }
+
+    private function hasOnlyEmail(string $email): bool
+    {
+        return !empty($email)
+            && (empty($this->getTelephone()) || is_null($this->getTelephone()))
+            && (empty($this->getDocument()) || is_null($this->getDocument()))
+            && (empty($this->getServiceUid()) || is_null($this->getServiceUid()));
+    }
+
+    private static function validateEmail(string $email): string
+    {
+        $email = trim($email);
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
+            return mb_strtolower($email);
+        }
+        return '';
     }
 }
