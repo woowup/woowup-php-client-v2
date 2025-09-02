@@ -38,7 +38,8 @@ class UserModel implements \JsonSerializable
     const BLACKLISTED_EMAIL_PATTERNS = [
         '*noreply@mercadolibre.com',
         '*mail.mercadolibre.com',
-        "ct.vtex.com.br"
+        'ct.vtex.com.br',
+        'notiene@*'
     ];
 
     const WHITELISTED_EMAIL_PATTERNS = [
@@ -196,9 +197,9 @@ class UserModel implements \JsonSerializable
 
         if ($sanitize) {
             if (self::isBlacklistedEmail($email)) {
-                $hasOnlyEmail = $this->hasOnlyEmail($email);
-                if ($hasOnlyEmail) {
-                    $this->setMailingEnabled('disabled');
+                if ($this->hasOnlyEmail($email)) {
+                    $this->email = $email;
+                    $this->setMailingEnabled(self::DISABLED_VALUE);
                     $this->setMailingDisabledReason('other');
                 } else {
                     $this->email = self::REPLACEMENT_EMAIL;
@@ -958,13 +959,13 @@ class UserModel implements \JsonSerializable
      */
     public function validate()
     {
+        if (isset($this->email) && !empty($this->email)) {
+            return true;
+        }
         if (isset($this->service_uid) && !empty($this->service_uid)) {
             return true;
         }
         if (isset($this->document) && !empty($this->document)) {
-            return true;
-        }
-        if (isset($this->email) && !empty($this->email)) {
             return true;
         }
         if (isset($this->telephone) && !empty($this->telephone)) {
