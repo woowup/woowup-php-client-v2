@@ -213,7 +213,7 @@ class UserModel implements \JsonSerializable
             }
 
             $validatedEmail = self::validateEmail($email);
-            $this->email = $validatedEmail ?? $email;
+            $this->email = (!empty($validatedEmail)) ? $validatedEmail : $email;
 
             $this->clearUserId();
         } else {
