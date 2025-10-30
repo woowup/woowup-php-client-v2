@@ -7,19 +7,17 @@ class StreetCleanser
 	const MAX_LENGTH = 100;
 
 	/**
-	 * Sanitize street field by limiting length and prettifying
+	 * Truncate street field to maximum allowed length
 	 *
 	 * @param string $street
 	 * @return string
 	 */
-	public function sanitize($street)
+	public function truncate($street)
 	{
-		if (!is_string($street) || $street === '') {
-			return null;
+		if (!is_string($street)) {
+			return '';
 		}
 
-		$street = mb_substr($street, 0, self::MAX_LENGTH);
-
-        return ucwords(mb_strtolower(trim($street)));
+		return mb_substr($street, 0, self::MAX_LENGTH);
 	}
 }

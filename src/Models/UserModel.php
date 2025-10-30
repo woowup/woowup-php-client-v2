@@ -340,9 +340,11 @@ class UserModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setStreet(string $street, $sanitize = true)
+    public function setStreet(string $street, $prettify = true)
     {
-        $this->street = $sanitize ? $this->cleanser->street->sanitize($street) : $street;
+        $street = $this->cleanser->street->truncate($street);
+
+        $this->street = $prettify ? $this->cleanser->names->prettify($street) : $street;
 
         return $this;
     }
