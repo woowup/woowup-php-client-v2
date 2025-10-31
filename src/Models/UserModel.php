@@ -342,10 +342,10 @@ class UserModel implements \JsonSerializable
      */
     public function setStreet(string $street, $prettify = true)
     {
-        $street = $this->cleanser->street->truncate($street);
-
-        $this->street = $prettify ? $this->cleanser->names->prettify($street) : $street;
-
+        if ($street !== ''){
+            $street = $this->cleanser->street->truncate($street);
+            $this->street = $prettify ? $this->cleanser->names->prettify($street) : $street;
+        }
         return $this;
     }
 
