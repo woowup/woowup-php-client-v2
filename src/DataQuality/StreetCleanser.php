@@ -37,33 +37,42 @@ class StreetCleanser
 		return $this->getJsonLength($street) <= self::MAX_LENGTH;
 	}
 
-	/**
-	 * Get JSON encoded length without quotes
-	 *
-	 * @param string $street
-	 * @return int
-	 */
-	private function getJsonLength($street)
-	{
-		return strlen(json_encode($street)) - 2;
-	}
+    /**
+     * Get the length of the string when JSON-encoded, excluding quotes.
+     * Some multibyte characters and special characters may occupy more
+     * bytes in JSON, so simple character count is not enough.
+     *
+     * @param string $street
+     * @return int Length of the string in JSON bytes, excluding surrounding quotes
+     */
+    private function getJsonLength($street)
+    {
+        return strlen(json_encode($street)) - 2;
+    }
 
-	/**
-	 * Truncate string iteratively until it fits within limit
-	 *
-	 * @param string $street
-	 * @return string
-	 */
-	private function truncateToFit($street)
-	{
-		while (mb_strlen($street) > 0) {
-			$street = mb_substr($street, 0, mb_strlen($street) - 1);
+    /**
+     * Efficiently truncate the string to fit within the JSON length limit.
+     * Uses a binary search approach to minimize iterations.
+     *
+     * @param string $street
+     * @return string Truncated street string that fits within MAX_LENGTH when JSON-encoded
+     */
+    private function truncateToFit($street)
+    {
+        $low = 0;
+        $high = mb_strlen($street);
 
-			if ($this->isWithinLimit($street)) {
-				break;
-			}
-		}
+        while ($low < $high) {
+            $mid = (int)(($low + $high + 1) / 2);
+            $candidate = mb_substr($street, 0, $mid);
 
-		return $street;
-	}
+            if ($this->getJsonLength($candidate) <= self::MAX_LENGTH) {
+                $low = $mid;
+            } else {
+                $high = $mid - 1;
+            }
+        }
+
+        return mb_substr($street, 0, $low);
+    }
 }
