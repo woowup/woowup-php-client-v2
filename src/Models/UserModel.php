@@ -79,6 +79,7 @@ class UserModel implements \JsonSerializable
     private $userapp_id;
     private $user_id;
     private $app_id;
+    private $current_telephone;
 
     // Data cleanser
     private $cleanser;
@@ -258,6 +259,27 @@ class UserModel implements \JsonSerializable
     }
 
     /**
+     * Get current telephone (from database)
+     * @return mixed
+     */
+    public function getCurrentTelephone()
+    {
+        return isset($this->current_telephone) ? $this->current_telephone : null;
+    }
+
+    /**
+     * Set current telephone (from database)
+     * Used to compare with new telephone when updating existing users
+     * @param string $telephone
+     * @return self
+     */
+    public function setCurrentTelephone($telephone)
+    {
+        $this->current_telephone = $telephone;
+        return $this;
+    }
+
+    /**
      * Get telephone
      * @return mixed
      */
@@ -267,13 +289,61 @@ class UserModel implements \JsonSerializable
     }
 
     /**
-     * Set telephone
-     * @param mixed $telephone
+     * Set telephone with smart comparison logic
+     * Compares new telephone with current_telephone (if exists) to decide whether to update
+     *
+     * Decision logic:
+     * - If new phone is valid and current is valid: REPLACE (intentional update)
+     * - If new phone is valid and current is invalid: REPLACE (improve quality)
+     * - If new phone is invalid and current is valid: KEEP current (protect good data)
+     * - If both are invalid: KEEP current (status quo)
+     * - If they are equal after sanitization: SKIP (optimization)
+     *
+     * @param string $telephone New telephone to set
+     * @param bool $sanitize Whether to sanitize the telephone
      * @return self
      */
     public function setTelephone(string $telephone, $sanitize = true)
     {
-        $this->telephone = $sanitize ? $this->cleanser->telephone->sanitize($telephone) : $telephone;
+        if (trim($telephone) === '') {
+            return $this;
+        }
+
+        $newPhoneSanitized = false;
+        if ($sanitize) {
+            $newPhoneSanitized = $this->cleanser->telephone->sanitize($telephone);
+        } else {
+            $newPhoneSanitized = $telephone;
+        }
+
+        if (!isset($this->current_telephone) || $this->current_telephone === null || $this->current_telephone === '') {
+            if ($newPhoneSanitized !== false) {
+                $this->telephone = $newPhoneSanitized;
+                $this->clearUserId();
+            }
+            return $this;
+        }
+
+        if ($newPhoneSanitized !== false && $newPhoneSanitized === $this->current_telephone) {
+            $this->telephone = $this->current_telephone;
+            $this->clearUserId();
+            return $this;
+        }
+
+        $currentPhoneIsValid = $this->cleanser->telephone->isValid($this->current_telephone);
+        $newPhoneIsValid = ($newPhoneSanitized !== false);
+
+        if ($newPhoneIsValid && $currentPhoneIsValid) {
+            $this->telephone = $newPhoneSanitized;
+        } elseif ($newPhoneIsValid && !$currentPhoneIsValid) {
+            $this->telephone = $newPhoneSanitized;
+        } elseif (!$newPhoneIsValid && $currentPhoneIsValid) {
+            $this->telephone = $this->current_telephone;
+        } else {
+            $this->telephone = $this->current_telephone;
+        }
+
+        $this->clearUserId();
 
         return $this;
     }
@@ -567,7 +637,7 @@ class UserModel implements \JsonSerializable
      */
     public function getMailingEnabled()
     {
-        return $this->mailing_enabled;
+        return isset($this->mailing_enabled) ? $this->mailing_enabled : null;
     }
 
     /**
@@ -595,7 +665,7 @@ class UserModel implements \JsonSerializable
      */
     public function getSmsEnabled()
     {
-        return $this->sms_enabled;
+        return isset($this->sms_enabled) ? $this->sms_enabled : null;
     }
 
     /**
@@ -623,7 +693,7 @@ class UserModel implements \JsonSerializable
      */
     public function getWhatsappEnabled()
     {
-        return $this->whatsapp_enabled;
+        return isset($this->whatsapp_enabled) ? $this->whatsapp_enabled : null;
     }
 
     /**
@@ -923,6 +993,15 @@ class UserModel implements \JsonSerializable
             return true;
         }
         if (isset($this->telephone) && !empty($this->telephone)) {
+            // If no email and no document but has telephone, disable contactability
+            if (!isset($this->email) && !isset($this->document)) {
+                $this->mailing_enabled = self::DISABLED_VALUE;
+                $this->sms_enabled = self::DISABLED_VALUE;
+                $this->whatsapp_enabled = self::DISABLED_VALUE;
+                $this->mailing_disabled_reason = 'other';
+                $this->sms_disabled_reason = 'other';
+                $this->whatsapp_disabled_reason = 'other';
+            }
             return true;
         }
 
@@ -948,7 +1027,7 @@ class UserModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if ((($value !== null) || in_array($property, self::CAN_BE_NULL_FIELDS)) && ($property !== 'cleanser') && ($property !== 'countriesHelper')) {
+            if ((($value !== null) || in_array($property, self::CAN_BE_NULL_FIELDS)) && ($property !== 'cleanser') && ($property !== 'countriesHelper') && ($property !== 'current_telephone')) {
                 $array[$property] = $value;
             }
         }

@@ -22,6 +22,7 @@ class PurchaseModel implements \JsonSerializable
     private $email;
     private $document;
     private $telephone;
+    private $current_telephone;
     private $points;
     private $channel;
     private $purchase_detail = [];
@@ -246,13 +247,55 @@ class PurchaseModel implements \JsonSerializable
     }
 
     /**
-     * @param mixed $document
+     * Set telephone with smart comparison logic
+     *
+     * Compares new telephone against current_telephone (if exists) to:
+     * - Protect valid existing data from invalid updates
+     * - Allow valid updates to replace invalid or valid data
+     * - Maintain status quo when both are invalid
+     *
+     * @param mixed $telephone The telephone to set
+     * @param bool $sanitize Whether to sanitize the input
      *
      * @return self
      */
     public function setTelephone($telephone, $sanitize = true)
     {
-        $this->telephone = $sanitize ? $this->cleanser->telephone->sanitize($telephone) : $telephone;
+        if (trim($telephone) === '') {
+            return $this;
+        }
+
+        $newPhoneSanitized = false;
+        if ($sanitize) {
+            $newPhoneSanitized = $this->cleanser->telephone->sanitize($telephone);
+        } else {
+            $newPhoneSanitized = $telephone;
+        }
+
+        if (!isset($this->current_telephone) || $this->current_telephone === null || $this->current_telephone === '') {
+            if ($newPhoneSanitized !== false) {
+                $this->telephone = $newPhoneSanitized;
+            }
+            return $this;
+        }
+
+        if ($newPhoneSanitized !== false && $newPhoneSanitized === $this->current_telephone) {
+            $this->telephone = $this->current_telephone;
+            return $this;
+        }
+
+        $currentPhoneIsValid = $this->cleanser->telephone->isValid($this->current_telephone);
+        $newPhoneIsValid = ($newPhoneSanitized !== false);
+
+        if ($newPhoneIsValid && $currentPhoneIsValid) {
+            $this->telephone = $newPhoneSanitized;
+        } elseif ($newPhoneIsValid && !$currentPhoneIsValid) {
+            $this->telephone = $newPhoneSanitized;
+        } elseif (!$newPhoneIsValid && $currentPhoneIsValid) {
+            $this->telephone = $this->current_telephone;
+        } else {
+            $this->telephone = $this->current_telephone;
+        }
 
         $this->clearUserId();
 
@@ -539,7 +582,7 @@ class PurchaseModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if (isset($value) && ($property !== 'cleanser')) {
+            if (isset($value) && ($property !== 'cleanser') && ($property !== 'current_telephone')) {
                 $array[$property] = $value;
             }
         }
