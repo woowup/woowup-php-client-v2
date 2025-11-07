@@ -86,12 +86,12 @@ class TelephoneCleanser
 		return $cleanedTelephone;
 	}
 
-	/**
-	 * Check if a telephone is valid without sanitizing
-	 *
-	 * @param string $telephone Telephone to validate
-	 * @return bool True if valid, false otherwise
-	 */
+    /**
+     * Check if telephone is valid
+     *
+     * @param mixed $telephone
+     * @return bool
+     */
 	public function isValid($telephone): bool
 	{
 		return $this->sanitize($telephone) !== false;

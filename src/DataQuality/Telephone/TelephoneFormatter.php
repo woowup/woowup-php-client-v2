@@ -97,7 +97,10 @@ class TelephoneFormatter
 
         if (preg_match('/^(\d{3})\1/', $numberPart)) return '+' . substr($numberPart, 3);
         if (preg_match('/^(\d{2})\1/', $numberPart, $m)) {
-            if ($m[1] === '55' && substr($numberPart, 2, 2) !== '55') return $telephone;
+            $nextTwoDigits = substr($numberPart, 2, 2);
+            if ($nextTwoDigits !== $m[1]) {
+                return $telephone;
+            }
             return '+' . substr($numberPart, 2);
         }
         if (preg_match('/^(\d)\1{2,}/', $numberPart)) return '+' . substr($numberPart, 1);

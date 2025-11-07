@@ -253,7 +253,7 @@ class PurchaseModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setTelephone($telephone, $sanitize = true)
+    public function setTelephone($telephone, $sanitize = false)
     {
         if (trim($telephone) === '') {
             return $this;
