@@ -41,7 +41,7 @@ class LengthValidator implements ValidatorInterface
 	{
 		$length = strlen($input);
 
-		if ($length < $this->minLength || $length >= $this->maxLength) {
+		if ($length < $this->minLength || $length > $this->maxLength) {
 			return false;
 		}
 

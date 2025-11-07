@@ -79,7 +79,6 @@ class UserModel implements \JsonSerializable
     private $userapp_id;
     private $user_id;
     private $app_id;
-    private $current_telephone;
 
     // Data cleanser
     private $cleanser;
@@ -259,27 +258,6 @@ class UserModel implements \JsonSerializable
     }
 
     /**
-     * Get current telephone (from database)
-     * @return mixed
-     */
-    public function getCurrentTelephone()
-    {
-        return isset($this->current_telephone) ? $this->current_telephone : null;
-    }
-
-    /**
-     * Set current telephone (from database)
-     * Used to compare with new telephone when updating existing users
-     * @param string $telephone
-     * @return self
-     */
-    public function setCurrentTelephone($telephone)
-    {
-        $this->current_telephone = $telephone;
-        return $this;
-    }
-
-    /**
      * Get telephone
      * @return mixed
      */
@@ -289,17 +267,9 @@ class UserModel implements \JsonSerializable
     }
 
     /**
-     * Set telephone with smart comparison logic
-     * Compares new telephone with current_telephone (if exists) to decide whether to update
+     * Set telephone
      *
-     * Decision logic:
-     * - If new phone is valid and current is valid: REPLACE (intentional update)
-     * - If new phone is valid and current is invalid: REPLACE (improve quality)
-     * - If new phone is invalid and current is valid: KEEP current (protect good data)
-     * - If both are invalid: KEEP current (status quo)
-     * - If they are equal after sanitization: SKIP (optimization)
-     *
-     * @param string $telephone New telephone to set
+     * @param string $telephone Telephone to set
      * @param bool $sanitize Whether to sanitize the telephone
      * @return self
      */
@@ -309,41 +279,23 @@ class UserModel implements \JsonSerializable
             return $this;
         }
 
-        $newPhoneSanitized = false;
         if ($sanitize) {
-            $newPhoneSanitized = $this->cleanser->telephone->sanitize($telephone);
-        } else {
-            $newPhoneSanitized = $telephone;
-        }
-
-        if (!isset($this->current_telephone) || $this->current_telephone === null || $this->current_telephone === '') {
-            if ($newPhoneSanitized !== false) {
-                $this->telephone = $newPhoneSanitized;
-                $this->clearUserId();
+            $cleanedTelephone = $this->cleanser->telephone->sanitize($telephone);
+            if ($cleanedTelephone) {
+                $this->telephone = $cleanedTelephone;
+            } else {
+                $this->telephone = $telephone;
+                $currentTags = $this->getTags();
+                if ($currentTags && strpos($currentTags, 'telephone_rejected') === false) {
+                    $this->setTags($currentTags . ',telephone_rejected');
+                } elseif (!$currentTags) {
+                    $this->setTags('telephone_rejected');
+                }
             }
             return $this;
         }
 
-        if ($newPhoneSanitized !== false && $newPhoneSanitized === $this->current_telephone) {
-            $this->telephone = $this->current_telephone;
-            $this->clearUserId();
-            return $this;
-        }
-
-        $currentPhoneIsValid = $this->cleanser->telephone->isValid($this->current_telephone);
-        $newPhoneIsValid = ($newPhoneSanitized !== false);
-
-        if ($newPhoneIsValid && $currentPhoneIsValid) {
-            $this->telephone = $newPhoneSanitized;
-        } elseif ($newPhoneIsValid && !$currentPhoneIsValid) {
-            $this->telephone = $newPhoneSanitized;
-        } elseif (!$newPhoneIsValid && $currentPhoneIsValid) {
-            $this->telephone = $this->current_telephone;
-        } else {
-            $this->telephone = $this->current_telephone;
-        }
-
-        $this->clearUserId();
+        $this->telephone = $telephone;
 
         return $this;
     }
@@ -983,6 +935,12 @@ class UserModel implements \JsonSerializable
      */
     public function validate()
     {
+        if (isset($this->tags) && strpos($this->tags, 'telephone_rejected') !== false) {
+            $this->sms_enabled = self::DISABLED_VALUE;
+            $this->whatsapp_enabled = self::DISABLED_VALUE;
+            $this->sms_disabled_reason = 'other';
+            $this->whatsapp_disabled_reason = 'other';
+        }
         if (isset($this->service_uid) && !empty($this->service_uid)) {
             return true;
         }
@@ -993,15 +951,6 @@ class UserModel implements \JsonSerializable
             return true;
         }
         if (isset($this->telephone) && !empty($this->telephone)) {
-            // If no email and no document but has telephone, disable contactability
-            if (!isset($this->email) && !isset($this->document)) {
-                $this->mailing_enabled = self::DISABLED_VALUE;
-                $this->sms_enabled = self::DISABLED_VALUE;
-                $this->whatsapp_enabled = self::DISABLED_VALUE;
-                $this->mailing_disabled_reason = 'other';
-                $this->sms_disabled_reason = 'other';
-                $this->whatsapp_disabled_reason = 'other';
-            }
             return true;
         }
 
@@ -1027,7 +976,7 @@ class UserModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if ((($value !== null) || in_array($property, self::CAN_BE_NULL_FIELDS)) && ($property !== 'cleanser') && ($property !== 'countriesHelper') && ($property !== 'current_telephone')) {
+            if ((($value !== null) || in_array($property, self::CAN_BE_NULL_FIELDS)) && ($property !== 'cleanser') && ($property !== 'countriesHelper')) {
                 $array[$property] = $value;
             }
         }
