@@ -273,7 +273,7 @@ class UserModel implements \JsonSerializable
      * @param bool $sanitize Whether to sanitize the telephone
      * @return self
      */
-    public function setTelephone(string $telephone, $sanitize = true)
+    public function setTelephone(string $telephone, $sanitize = false)
     {
         if (trim($telephone) === '') {
             return $this;
@@ -285,12 +285,7 @@ class UserModel implements \JsonSerializable
                 $this->telephone = $cleanedTelephone;
             } else {
                 $this->telephone = $telephone;
-                $currentTags = $this->getTags();
-                if ($currentTags && strpos($currentTags, 'telephone_rejected') === false) {
-                    $this->setTags($currentTags . ',telephone_rejected');
-                } elseif (!$currentTags) {
-                    $this->setTags('telephone_rejected');
-                }
+                $this->setTags('telephone_rejected');
             }
             return $this;
         }
@@ -545,18 +540,30 @@ class UserModel implements \JsonSerializable
      */
     public function getTags()
     {
-        return $this->tags;
+        return $this->tags ?? null;
     }
 
     /**
      * Set tags
+     * Merges new tags with existing tags, avoiding duplicates
      * @param mixed $tags
      *
      * @return self
      */
     public function setTags(string $tags)
     {
-        $this->tags = $tags;
+        $currentTags = $this->getTags();
+
+        if ($currentTags) {
+            $currentTagsArray = array_map('trim', explode(',', $currentTags));
+            $newTagsArray = array_map('trim', explode(',', $tags));
+
+            $allTags = array_unique(array_merge($currentTagsArray, $newTagsArray));
+
+            $this->tags = implode(',', $allTags);
+        } else {
+            $this->tags = $tags;
+        }
 
         return $this;
     }
