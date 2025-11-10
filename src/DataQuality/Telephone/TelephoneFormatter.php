@@ -19,6 +19,10 @@ class TelephoneFormatter
 	 */
 	private $characterCleanser;
 
+    const COUNTRY_CODE = [
+        '54', '56', '57', '52', '51', '598', '595', '593', '58', '55', '591'
+    ];
+
 	public function __construct()
 	{
 		$this->characterCleanser = new CharacterCleanser();
@@ -51,7 +55,7 @@ class TelephoneFormatter
         $telephone = $this->removeDuplicateCountryCode($telephone);
         $telephone = $this->removeArgentina15Prefix($telephone);
 
-        return $this->characterCleanser->removeNonDigits($telephone);
+        return $this->normalizeWithInternationalPrefix($telephone);
 	}
 
     /**
@@ -92,18 +96,17 @@ class TelephoneFormatter
 	 */
     private function removeDuplicateCountryCode(string $telephone): string
     {
-        if ($telephone[0] !== '+') return $telephone;
-        $numberPart = substr($telephone, 1);
+        if (empty($telephone)) return $telephone;
 
-        if (preg_match('/^(\d{3})\1/', $numberPart)) return '+' . substr($numberPart, 3);
-        if (preg_match('/^(\d{2})\1/', $numberPart, $m)) {
-            $nextTwoDigits = substr($numberPart, 2, 2);
-            if ($nextTwoDigits !== $m[1]) {
-                return $telephone;
+        $hasPlus = $telephone[0] === '+';
+        $cleanNumber = $hasPlus ? substr($telephone, 1) : $telephone;
+
+        foreach (self::COUNTRY_CODE as $code) {
+            if (strpos($cleanNumber, $code . $code) === 0) {
+                $cleanNumber = substr($cleanNumber, strlen($code));
+                return $hasPlus ? '+' . $cleanNumber : $cleanNumber;
             }
-            return '+' . substr($numberPart, 2);
         }
-        if (preg_match('/^(\d)\1{2,}/', $numberPart)) return '+' . substr($numberPart, 1);
 
         return $telephone;
     }
@@ -174,7 +177,7 @@ class TelephoneFormatter
 		$digitsOnly = preg_replace('/[^0-9]/', '', $telephone);
 
 		if (strlen($digitsOnly) >= 10) {
-			return '+' . substr($telephone, 2);
+			return substr($telephone, 2);
 		}
 
 		return $telephone;
@@ -192,21 +195,16 @@ class TelephoneFormatter
 	{
 		$telephone = trim($telephone);
 
-		// remove common formatting characters but keep +
-		$telephone = $this->characterCleanser->removeFormatting($telephone);
+        if (strpos($telephone, '+') === 0) return $telephone;
 
-		// keep only + and digits
+		$telephone = $this->characterCleanser->removeFormatting($telephone);
 		$telephone = $this->characterCleanser->keepDigitsAndPlus($telephone);
 
-		// ensure only one + at the beginning
-		if (substr_count($telephone, '+') > 1) {
-			$telephone = '+' . str_replace('+', '', $telephone);
-		}
-
-		// if + exists but not at the beginning, move it to the beginning
-		if (strpos($telephone, '+') > 0) {
-			$telephone = '+' . str_replace('+', '', $telephone);
-		}
+        foreach (self::COUNTRY_CODE as $countryCode) {
+            if (strpos($telephone, $countryCode) === 0) {
+                return '+' . $telephone;
+            }
+        }
 
 		return $telephone;
 	}
