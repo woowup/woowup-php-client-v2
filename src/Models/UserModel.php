@@ -33,6 +33,8 @@ class UserModel implements \JsonSerializable
         'service_uid',
         'birthdate',
     ];
+    protected const TELEPHONE_CLEANED = 'telephone_cleaned';
+    protected const TELEPHONE_REJECTED = 'telephone_rejected';
 
     private $service_uid;
     private $document;
@@ -283,9 +285,12 @@ class UserModel implements \JsonSerializable
             $cleanedTelephone = $this->cleanser->telephone->sanitize($telephone);
             if ($cleanedTelephone) {
                 $this->telephone = $cleanedTelephone;
+                $this->setTags(self::TELEPHONE_CLEANED);
+                $this->removeTags(self::TELEPHONE_REJECTED);
             } else {
                 $this->telephone = $telephone;
-                $this->setTags('telephone_rejected');
+                $this->setTags(self::TELEPHONE_REJECTED);
+                $this->removeTags(self::TELEPHONE_CLEANED);
             }
             return $this;
         }
@@ -563,6 +568,29 @@ class UserModel implements \JsonSerializable
             $this->tags = implode(',', $allTags);
         } else {
             $this->tags = $tags;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove tags
+     * Remove specified tags from existing tags, if present.
+     * @param mixed $tags
+     *
+     * @return self
+     */
+    public function removeTags(string $tags)
+    {
+        $currentTags = $this->getTags();
+
+        if ($currentTags) {
+            $currentTagsArray = array_map('trim', explode(',', $currentTags));
+            $newTagsArray = array_map('trim', explode(',', $tags));
+
+            $remainingTags = array_diff($currentTagsArray, $newTagsArray);
+
+            $this->tags = implode(',', $remainingTags);
         }
 
         return $this;
