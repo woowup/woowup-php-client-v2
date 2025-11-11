@@ -33,6 +33,8 @@ class UserModel implements \JsonSerializable
         'service_uid',
         'birthdate',
     ];
+    protected const TELEPHONE_CLEANED = 'telephone_cleaned';
+    protected const TELEPHONE_REJECTED = 'telephone_rejected';
 
     private $service_uid;
     private $document;
@@ -268,12 +270,32 @@ class UserModel implements \JsonSerializable
 
     /**
      * Set telephone
-     * @param mixed $telephone
+     *
+     * @param string $telephone Telephone to set
+     * @param bool $sanitize Whether to sanitize the telephone
      * @return self
      */
-    public function setTelephone(string $telephone, $sanitize = true)
+    public function setTelephone(string $telephone, $sanitize = false)
     {
-        $this->telephone = $sanitize ? $this->cleanser->telephone->sanitize($telephone) : $telephone;
+        if (trim($telephone) === '') {
+            return $this;
+        }
+
+        if ($sanitize) {
+            $cleanedTelephone = $this->cleanser->telephone->sanitize($telephone);
+            if ($cleanedTelephone) {
+                $this->telephone = $cleanedTelephone;
+                $this->setTags(self::TELEPHONE_CLEANED);
+                $this->removeTags(self::TELEPHONE_REJECTED);
+            } else {
+                $this->telephone = $telephone;
+                $this->setTags(self::TELEPHONE_REJECTED);
+                $this->removeTags(self::TELEPHONE_CLEANED);
+            }
+            return $this;
+        }
+
+        $this->telephone = $telephone;
 
         return $this;
     }
@@ -523,18 +545,53 @@ class UserModel implements \JsonSerializable
      */
     public function getTags()
     {
-        return $this->tags;
+        return $this->tags ?? null;
     }
 
     /**
      * Set tags
+     * Merges new tags with existing tags, avoiding duplicates
      * @param mixed $tags
      *
      * @return self
      */
     public function setTags(string $tags)
     {
-        $this->tags = $tags;
+        $currentTags = $this->getTags();
+
+        if ($currentTags) {
+            $currentTagsArray = array_map('trim', explode(',', $currentTags));
+            $newTagsArray = array_map('trim', explode(',', $tags));
+
+            $allTags = array_unique(array_merge($currentTagsArray, $newTagsArray));
+
+            $this->tags = implode(',', $allTags);
+        } else {
+            $this->tags = $tags;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove tags
+     * Remove specified tags from existing tags, if present.
+     * @param mixed $tags
+     *
+     * @return self
+     */
+    public function removeTags(string $tags)
+    {
+        $currentTags = $this->getTags();
+
+        if ($currentTags) {
+            $currentTagsArray = array_map('trim', explode(',', $currentTags));
+            $newTagsArray = array_map('trim', explode(',', $tags));
+
+            $remainingTags = array_diff($currentTagsArray, $newTagsArray);
+
+            $this->tags = implode(',', $remainingTags);
+        }
 
         return $this;
     }
@@ -567,7 +624,7 @@ class UserModel implements \JsonSerializable
      */
     public function getMailingEnabled()
     {
-        return $this->mailing_enabled;
+        return isset($this->mailing_enabled) ? $this->mailing_enabled : null;
     }
 
     /**
@@ -595,7 +652,7 @@ class UserModel implements \JsonSerializable
      */
     public function getSmsEnabled()
     {
-        return $this->sms_enabled;
+        return isset($this->sms_enabled) ? $this->sms_enabled : null;
     }
 
     /**
@@ -623,7 +680,7 @@ class UserModel implements \JsonSerializable
      */
     public function getWhatsappEnabled()
     {
-        return $this->whatsapp_enabled;
+        return isset($this->whatsapp_enabled) ? $this->whatsapp_enabled : null;
     }
 
     /**
@@ -913,6 +970,12 @@ class UserModel implements \JsonSerializable
      */
     public function validate()
     {
+        if (isset($this->tags) && strpos($this->tags, 'telephone_rejected') !== false) {
+            $this->sms_enabled = self::DISABLED_VALUE;
+            $this->whatsapp_enabled = self::DISABLED_VALUE;
+            $this->sms_disabled_reason = 'other';
+            $this->whatsapp_disabled_reason = 'other';
+        }
         if (isset($this->service_uid) && !empty($this->service_uid)) {
             return true;
         }

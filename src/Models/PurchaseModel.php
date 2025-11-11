@@ -246,14 +246,27 @@ class PurchaseModel implements \JsonSerializable
     }
 
     /**
-     * @param mixed $document
+     * Set telephone
+     *
+     * @param mixed $telephone The telephone to set
+     * @param bool $sanitize Whether to sanitize the input
      *
      * @return self
      */
-    public function setTelephone($telephone, $sanitize = true)
+    public function setTelephone($telephone, $sanitize = false)
     {
-        $this->telephone = $sanitize ? $this->cleanser->telephone->sanitize($telephone) : $telephone;
+        if (trim($telephone) === '') {
+            return $this;
+        }
 
+        if ($sanitize) {
+            $telephone = $this->cleanser->telephone->sanitize($telephone);
+            if ($telephone === false) {
+                return $this;
+            }
+        }
+
+        $this->telephone = $telephone;
         $this->clearUserId();
 
         return $this;
