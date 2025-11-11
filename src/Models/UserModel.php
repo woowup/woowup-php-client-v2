@@ -283,15 +283,22 @@ class UserModel implements \JsonSerializable
 
         if ($sanitize) {
             $cleanedTelephone = $this->cleanser->telephone->sanitize($telephone);
-            if ($cleanedTelephone) {
-                $this->telephone = $cleanedTelephone;
-                $this->setTags(self::TELEPHONE_CLEANED);
-                $this->removeTags(self::TELEPHONE_REJECTED);
-            } else {
+
+            if (!$cleanedTelephone) {
                 $this->telephone = $telephone;
                 $this->setTags(self::TELEPHONE_REJECTED);
                 $this->removeTags(self::TELEPHONE_CLEANED);
+                return $this;
             }
+
+            if ($cleanedTelephone === $telephone) {
+                $this->telephone = $telephone;
+                return $this;
+            }
+
+            $this->telephone = $cleanedTelephone;
+            $this->setTags(self::TELEPHONE_CLEANED);
+            $this->removeTags(self::TELEPHONE_REJECTED);
             return $this;
         }
 
