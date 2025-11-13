@@ -35,6 +35,7 @@ class UserModel implements \JsonSerializable
     ];
     protected const TELEPHONE_CLEANED = 'telephone_cleaned';
     protected const TELEPHONE_REJECTED = 'telephone_rejected';
+    protected const TELEPHONE_VALIDATED = 'telephone_validated';
 
     private $service_uid;
     private $document;
@@ -287,17 +288,19 @@ class UserModel implements \JsonSerializable
             if (!$cleanedTelephone) {
                 $this->telephone = $telephone;
                 $this->setTags(self::TELEPHONE_REJECTED);
-                $this->removeTags(self::TELEPHONE_CLEANED);
+                $this->removeTags(self::TELEPHONE_CLEANED . ',' . self::TELEPHONE_VALIDATED);
                 return $this;
             }
 
             if ($cleanedTelephone === $telephone) {
                 $this->telephone = $telephone;
+                $this->setTags(self::TELEPHONE_VALIDATED);
+                $this->removeTags(self::TELEPHONE_REJECTED . ',' . self::TELEPHONE_CLEANED);
                 return $this;
             }
 
             $this->telephone = $cleanedTelephone;
-            $this->setTags(self::TELEPHONE_CLEANED);
+            $this->setTags(self::TELEPHONE_VALIDATED . ',' . self::TELEPHONE_CLEANED);
             $this->removeTags(self::TELEPHONE_REJECTED);
             return $this;
         }
