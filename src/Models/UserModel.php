@@ -283,6 +283,10 @@ class UserModel implements \JsonSerializable
         }
 
         if ($sanitize) {
+            if ($this->cleanser->telephone->hasApiRejectedPatterns($telephone)) {
+                return $this;
+            }
+
             $cleanedTelephone = $this->cleanser->telephone->sanitize($telephone);
 
             if (!$cleanedTelephone) {
