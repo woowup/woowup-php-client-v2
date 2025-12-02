@@ -260,6 +260,10 @@ class PurchaseModel implements \JsonSerializable
         }
 
         if ($sanitize) {
+            if ($this->cleanser->telephone->hasApiRejectedPatterns($telephone)) {
+                return $this;
+            }
+
             $telephone = $this->cleanser->telephone->sanitize($telephone);
             if ($telephone === false) {
                 return $this;
