@@ -3,34 +3,45 @@
 namespace WoowUpV2\DataQuality;
 
 use Mailcheck\Mailcheck as Mailcheck;
+use WoowUpV2\DataQuality\Validators\LengthValidator;
+use WoowUpV2\DataQuality\Validators\RepeatedValidator;
+use WoowUpV2\DataQuality\Validators\SequenceValidator;
 
 class EmailCleanser
 {
 	const GENERIC_TLDS    = ["com", "net", "org", "info", "edu", "gov", "mil"];
 	const GEOGRAPHIC_TLDS = ["ar", "es", "co", "pe", "bo", "br", "fr", "do", "co.uk"];
 
+    const GMAIL_DOMAIN = [
+        'gmail',
+        'gamil', 'gmial', 'gmai', 'gmal', 'gnail', 'gmaul', 'gmaol', 'gmaik', 'gmaio', 'mail',
+        'gmeil', 'gmeel', 'gmel',
+        'gmaill', 'gmil', 'ggmail', 'gmmail', 'gmailm',
+        'gemail', 'gaiml', 'gail', 'gmailcom','gmailcomcom',
+    ];
+
+    private $emailUser;
+    private $emailDomain;
+
 	public function __construct()
 	{
-		return $this;
-	}
+        $this->validators = [
+            new LengthValidator(6, 30),
+            new RepeatedValidator(8, false),
+            new SequenceValidator(7, false)
+        ];
+        $this->emailDomain = null;
+	    $this->emailUser   = null;
+    }
 
 	public function sanitize($email)
 	{
-		/*$mailcheck = new Mailcheck();
-		$mailcheck->setPopularTlds($this->buildPopularTlds());
+        $this->extractEmailParts($email);
 
-		$email = self::prettify($email);
-		$email = $mailcheck->suggest($email);
-		if (self::validate($email)) {
-			return $email;
-		} else {
-			$email = filter_var($email, FILTER_SANITIZE_EMAIL);
-			if (self::validate($email)) {
-				return $email;
-			}
-		}
+        if ($this->emailUser !== null || $this->emailDomain !== null) {
+            $this->emailUser  = strtolower(trim($this->emailUser));
 
-		return false;*/
+        }
 
 		return self::prettify($email);
 	}
@@ -56,4 +67,33 @@ class EmailCleanser
 
 		return $popularTlds;
 	}
+
+    protected function extractEmailParts(string $email): void
+    {
+        foreach (self::GMAIL_DOMAIN as $knownDomain) {
+            $pos = strpos($email, $knownDomain);
+            if ($pos !== false) {
+                // Lo de la izquierda es user
+                $this->emailUser   = substr($email, 0, $pos);
+                // La coincidencia y lo que sigue es domain
+                $this->emailDomain = '@gmail.com';
+                return;
+            }
+        }
+
+        // Si no hay @ válido ni coincidencia de dominio
+        $this->emailUser   = null;
+        $this->emailDomain = null;
+    }
+
+    public function getEmailUser(): ?string
+    {
+        return $this->emailUser;
+    }
+
+    public function getEmailDomain(): ?string
+    {
+        return $this->emailDomain;
+    }
+
 }
