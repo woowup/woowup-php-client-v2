@@ -36,8 +36,8 @@ class TelephoneCleanser
 		$this->validators = [
 			new NumericValidator(),
 			new LengthValidator(8, 15), // min: 8, max: 15 (E.164 standard)
-			new RepeatedValidator(), // 5+ same digits: 5555532423
-			new SequenceValidator(), // 9+ sequential patterns: 987654321, 1234567890
+			new RepeatedValidator(5, true), // 5+ same digits: 5555532423
+			new SequenceValidator(8, true), // 9+ sequential patterns: 987654321, 1234567890
 			new GenericPhoneValidator(), // Known generic/placeholder numbers
 		];
 

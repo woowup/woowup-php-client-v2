@@ -33,14 +33,14 @@ class SequenceValidator implements ValidatorInterface
         $this->digitsOnly = $digitsOnly;
     }
 
-	/**
-	 * Validate that input doesn't contain long sequential patterns
-	 *
-	 * @param string $input The input to validate
-	 * @return bool True if valid, false if contains long sequences
-	 */
-	public function validate(string $input): bool
-	{
+    /**
+     * Validate that input doesn't contain long sequential patterns
+     *
+     * @param string $input The input to validate
+     * @return bool True if valid, false if contains long sequences
+     */
+    public function validate(string $input): bool
+    {
 
         if ($this->digitsOnly) {
             if (!ctype_digit($input)) {
@@ -59,7 +59,7 @@ class SequenceValidator implements ValidatorInterface
             return false;
         }
 
-        if ($this->hasAlphabetSequence($inputLower)){
+        if ($this->hasAscendingSequence($inputLower) || $this->hasDescendingSequence($inputLower)){
             return false;
         }
 
@@ -67,62 +67,41 @@ class SequenceValidator implements ValidatorInterface
             return false;
         }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Check if input contains ascending sequential digits
-	 *
-	 * @param string $input Input to check
-	 * @return bool True if contains ascending sequence
-	 */
-	private function hasAscendingDigitSequence(string $input): bool
-	{
-		$sequenceCount = 1;
+    private function hasAscendingDigitSequence(string $input): bool
+    {
+        return $this->hasSequentialDigitSequence($input, 1);
+    }
 
-		for ($i = 1; $i < strlen($input); $i++) {
-			$current = (int)$input[$i];
-			$previous = (int)$input[$i - 1];
+    private function hasDescendingDigitSequence(string $input): bool
+    {
+        return $this->hasSequentialDigitSequence($input, -1);
+    }
 
-			if ($current === ($previous + 1) % 10) {
-				$sequenceCount++;
-				if ($sequenceCount >= $this->minSequenceLength) {
-					return true;
-				}
-			} else {
-				$sequenceCount = 1;
-			}
-		}
+    private function hasSequentialDigitSequence(string $input, int $step): bool
+    {
+        $sequenceCount = 1;
+        $length = strlen($input);
 
-		return false;
-	}
+        for ($i = 1; $i < $length; $i++) {
+            $current = (int) $input[$i];
+            $previous = (int) $input[$i - 1];
 
-	/**
-	 * Check if input contains descending sequential digits
-	 *
-	 * @param string $input Input to check
-	 * @return bool True if contains descending sequence
-	 */
-	private function hasDescendingDigitSequence(string $input): bool
-	{
-		$sequenceCount = 1;
+            if ($current === ($previous + $step + 10) % 10) {
+                $sequenceCount++;
 
-		for ($i = 1; $i < strlen($input); $i++) {
-			$current = (int)$input[$i];
-			$previous = (int)$input[$i - 1];
+                if ($sequenceCount >= $this->minSequenceLength) {
+                    return true;
+                }
+            } else {
+                $sequenceCount = 1;
+            }
+        }
 
-			if ($current === ($previous - 1 + 10) % 10) {
-				$sequenceCount++;
-				if ($sequenceCount >= $this->minSequenceLength) {
-					return true;
-				}
-			} else {
-				$sequenceCount = 1;
-			}
-		}
-
-		return false;
-	}
+        return false;
+    }
 
     private function hasAscendingSequence(string $input): bool
     {
