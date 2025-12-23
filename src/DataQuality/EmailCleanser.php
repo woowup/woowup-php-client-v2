@@ -13,12 +13,12 @@ class EmailCleanser
 	const GENERIC_TLDS    = ["com", "net", "org", "info", "edu", "gov", "mil"];
 	const GEOGRAPHIC_TLDS = ["ar", "es", "co", "pe", "bo", "br", "fr", "do", "co.uk"];
 
-    const GMAIL_DOMAIN = [
+    const GMAIL_DOMAINS = [
         'gmail',
         'gamil', 'gmial', 'gmai', 'gmal', 'gnail', 'gmaul', 'gmaol', 'gmaik', 'gmaio',
         'gmeil', 'gmeel', 'gmel',
         'gmaill', 'gmil', 'ggmail', 'gmmail', 'gmailm',
-        'gemail', 'gaiml', 'gail',
+        'gemail', 'gaiml', 'gail', 'gmailcom', 'gmailcomcom',
     ];
 
     /**

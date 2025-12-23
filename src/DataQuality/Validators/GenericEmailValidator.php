@@ -9,16 +9,20 @@ class GenericEmailValidator
         'notiene',
         'nocontacto',
         'unavailable',
-        'noautoriza',
+        'noautoriz',
         'example',
         'ejemplo',
-        'facturacion.electronica',
-        'factura.electronica',
+        'facturacion',
+        'factura',
         'noemail',
         'prueba',
         'nomail',
         'notmail',
-        'ninguno'
+        'ninguno',
+        'nosustent',
+        'noregistra',
+        'nomaneja',
+        'nopresenta'
     ];
 
     public function validate(string $email): bool
