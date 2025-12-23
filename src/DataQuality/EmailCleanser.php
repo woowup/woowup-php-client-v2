@@ -3,6 +3,7 @@
 namespace WoowUpV2\DataQuality;
 
 use Mailcheck\Mailcheck as Mailcheck;
+use WoowUpV2\DataQuality\Formatters\EmailFormatter;
 use WoowUpV2\DataQuality\Validators\LengthValidator;
 use WoowUpV2\DataQuality\Validators\RepeatedValidator;
 use WoowUpV2\DataQuality\Validators\SequenceValidator;
@@ -14,17 +15,22 @@ class EmailCleanser
 
     const GMAIL_DOMAIN = [
         'gmail',
-        'gamil', 'gmial', 'gmai', 'gmal', 'gnail', 'gmaul', 'gmaol', 'gmaik', 'gmaio', 'mail',
+        'gamil', 'gmial', 'gmai', 'gmal', 'gnail', 'gmaul', 'gmaol', 'gmaik', 'gmaio',
         'gmeil', 'gmeel', 'gmel',
         'gmaill', 'gmil', 'ggmail', 'gmmail', 'gmailm',
-        'gemail', 'gaiml', 'gail', 'gmailcom','gmailcomcom',
+        'gemail', 'gaiml', 'gail',
     ];
 
+    /**
+     * @var EmailFormatter
+     */
+    private $formatter;
     private $emailUser;
     private $emailDomain;
 
 	public function __construct()
 	{
+        $this->formatter = new EmailFormatter();
         $this->validators = [
             new LengthValidator(6, 30),
             new RepeatedValidator(8, false),
@@ -40,10 +46,18 @@ class EmailCleanser
 
         if ($this->emailUser !== null || $this->emailDomain !== null) {
             $this->emailUser  = strtolower(trim($this->emailUser));
-
         }
 
-		return self::prettify($email);
+        $cleanedUserEmail = $this->formatter->clean($this->emailUser);
+
+        if ($cleanedUserEmail === '') {
+            return false;
+        }
+
+        $this->emailUser = $cleanedUserEmail;
+        $sanitizedEmail =  $cleanedUserEmail.$this->emailDomain;
+
+        return self::prettify($sanitizedEmail);
 	}
 
 	public function validate($email)

@@ -2,7 +2,7 @@
 
 namespace WoowUpV2\DataQuality;
 
-use WoowUpV2\DataQuality\Telephone\TelephoneFormatter;
+use WoowUpV2\DataQuality\Formatters\TelephoneFormatter;
 use WoowUpV2\DataQuality\Validators\GenericPhoneValidator;
 use WoowUpV2\DataQuality\Validators\LengthValidator;
 use WoowUpV2\DataQuality\Validators\NumericValidator;
