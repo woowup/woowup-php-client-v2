@@ -283,6 +283,10 @@ class UserModel implements \JsonSerializable
         }
 
         if ($sanitize) {
+            if ($this->cleanser->telephone->hasApiRejectedPatterns($telephone)) {
+                return $this;
+            }
+
             $cleanedTelephone = $this->cleanser->telephone->sanitize($telephone);
 
             if (!$cleanedTelephone) {
@@ -833,6 +837,96 @@ class UserModel implements \JsonSerializable
         }
 
         return $this;
+    }
+
+        /**
+     * Get a specific custom attribute value
+     *
+     * Helper method to read a single custom attribute by key.
+     * Used internally by validateAndPreserveTelephone().
+     *
+     * @param string $key The custom attribute key to retrieve
+     * @return mixed The custom attribute value or null if not found
+     */
+    private function getCustomAttribute(string $key)
+    {
+        if (!isset($this->custom_attributes)) {
+            return null;
+        }
+        return $this->custom_attributes->{$key} ?? null;
+    }
+
+    /**
+     * Validates telephone against existing WoowUp entity and preserves if necessary.
+     *
+     * This method implements the telephone preservation logic to prevent valid
+     * telephone numbers from being overwritten by invalid ones.
+     *
+     * Prerequisites:
+     * - Must have called setTelephone() first to set the new telephone value
+     * - Must have '_woowup_entity' stored in custom_attributes (caller responsibility)
+     *
+     * Business Logic:
+     * - If WoowUp has VALID telephone AND new is INVALID → Preserve (clear new telephone)
+     * - If WoowUp has INVALID telephone AND new is VALID → Allow update
+     * - If both VALID → Allow update
+     * - If both INVALID → Allow update
+     *
+     * Validity Determination:
+     * - VALID = has 'telephone_validated' or 'telephone_cleaned' tag
+     * - INVALID = has 'telephone_rejected' tag OR any other state
+     *
+     * Example Usage:
+     * ```php
+     * // In BaseHandler (connectors repo):
+     * $woowupEntity = $finder->find($this->woowup, $identity, $appId);
+     * $user->addCustomAttribute('_woowup_entity', $woowupEntity);
+     * $preserved = $user->validateAndPreserveTelephone();
+     * if ($preserved) {
+     *     $logger->info("Telephone was preserved");
+     * }
+     * ```
+     *
+     * @return bool True if telephone was preserved (cleared), false otherwise
+     */
+    public function validateAndPreserveTelephone(): bool
+    {
+        // 1. Get WoowUp entity from custom_attributes storage
+        $woowupEntity = $this->getCustomAttribute('_woowup_entity');
+        if (!$woowupEntity || !is_array($woowupEntity)) {
+            // No WoowUp entity available - nothing to preserve against
+            return false;
+        }
+
+        // 2. Extract relevant data
+        $currentTelephone = $woowupEntity['telephone'] ?? null;
+        $currentTags = $woowupEntity['tags'] ?? '';
+        $newTelephone = $this->getTelephone();
+
+        // 3. Validate we have data to compare
+        if (!$currentTelephone || !$newTelephone) {
+            // Missing telephone data - cannot make preservation decision
+            return false;
+        }
+
+        // 4. Check if WoowUp telephone is valid (based on tags)
+        $currentIsValid = (strpos($currentTags, self::TELEPHONE_VALIDATED) !== false) ||
+                         (strpos($currentTags, self::TELEPHONE_CLEANED) !== false);
+
+        // 5. Check if new telephone is valid (based on tags from setTelephone)
+        $myTags = $this->getTags() ?? '';
+        $newIsValid = (strpos($myTags, self::TELEPHONE_VALIDATED) !== false) ||
+                     (strpos($myTags, self::TELEPHONE_CLEANED) !== false);
+
+        // 6. Preservation decision
+        if ($currentIsValid && !$newIsValid) {
+            // Current is VALID, new is INVALID → Preserve by clearing
+            $this->telephone = null;
+            return true; // Telephone was preserved
+        }
+
+        // All other cases: allow update
+        return false; // Telephone was not preserved
     }
 
         /**
