@@ -189,4 +189,19 @@ class Users extends Endpoint
 
         throw new \Exception("Family member is not valid", 1);
     }
+
+    public function removeTags($userAppId, $tags)
+    {
+        if (is_array($tags)) {
+            $tags = implode(',', $tags);
+        }
+
+        $params = [
+            'remove_tags' => $tags
+        ];
+
+        $response = $this->put($this->host . '/users/' . $userAppId, $params);
+
+        return $response->getStatusCode() == Endpoint::HTTP_OK;
+    }
 }
