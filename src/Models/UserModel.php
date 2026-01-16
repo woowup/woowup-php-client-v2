@@ -569,12 +569,16 @@ class UserModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setTags(string $tags)
+    public function setTags($tags)
     {
+        $tags = is_array($tags) ? implode(',', $tags) : $tags;
+
         $currentTags = $this->getTags();
 
         if ($currentTags) {
-            $currentTagsArray = array_map('trim', explode(',', $currentTags));
+            $currentTagsStr = is_array($currentTags) ? implode(',', $currentTags) : $currentTags;
+
+            $currentTagsArray = array_map('trim', explode(',', $currentTagsStr));
             $newTagsArray = array_map('trim', explode(',', $tags));
 
             $allTags = array_unique(array_merge($currentTagsArray, $newTagsArray));
@@ -839,7 +843,7 @@ class UserModel implements \JsonSerializable
         return $this;
     }
 
-        /**
+    /**
      * @return mixed
      */
     public function getUserappId()
