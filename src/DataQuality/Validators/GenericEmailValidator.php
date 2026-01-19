@@ -22,7 +22,18 @@ class GenericEmailValidator
         'nosustent',
         'noregistra',
         'nomaneja',
-        'nopresenta'
+        'nopresenta',
+        'test',
+        'user',
+        'nombre',
+        'apellido',
+        'usuario',
+        'email',
+        'nocuenta',
+        'sinmail',
+        'noposee',
+        'notengo',
+        'noreply',
     ];
 
     public function validate(string $email): bool

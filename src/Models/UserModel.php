@@ -36,6 +36,9 @@ class UserModel implements \JsonSerializable
     protected const TELEPHONE_CLEANED = 'telephone_cleaned';
     protected const TELEPHONE_REJECTED = 'telephone_rejected';
     protected const TELEPHONE_VALIDATED = 'telephone_validated';
+    protected const EMAIL_CLEANED = 'email_cleaned';
+    protected const EMAIL_REJECTED = 'email_rejected';
+    protected const EMAIL_VALIDATED = 'email_validated';
 
     private $service_uid;
     private $document;
@@ -171,19 +174,38 @@ class UserModel implements \JsonSerializable
      */
     public function setEmail(string $email, $sanitize = true)
     {
-        if ($email !== '') {
-            if ($sanitize) {
-                if (($email = $this->cleanser->email->sanitize($email)) === false) {
-                    trigger_error("Email sanitization of $email failed", E_USER_WARNING);
-                    return $this;
-                }
-            }
-            $this->email = $email;
-
-            $this->clearUserId();
-        } else {
+        if ($email === '') {
             trigger_error("Invalid email", E_USER_WARNING);
+            return $this;
         }
+
+        if ($sanitize) {
+            $originalEmail = $email;
+            $cleanedEmail = $this->cleanser->email->sanitize($email);
+
+            if ($cleanedEmail === false) {
+                $this->email = $originalEmail;
+                $this->setTags(self::EMAIL_REJECTED);
+                $this->removeTags(self::EMAIL_CLEANED . ',' . self::EMAIL_VALIDATED);
+                trigger_error("Email sanitization of $originalEmail failed", E_USER_WARNING);
+                $this->clearUserId();
+                return $this;
+            }
+
+            if ($cleanedEmail === $originalEmail) {
+                $this->email = $originalEmail;
+                $this->setTags(self::EMAIL_VALIDATED);
+                $this->removeTags(self::EMAIL_REJECTED . ',' . self::EMAIL_CLEANED);
+            } else {
+                $this->email = $cleanedEmail;
+                $this->setTags(self::EMAIL_VALIDATED . ',' . self::EMAIL_CLEANED);
+                $this->removeTags(self::EMAIL_REJECTED);
+            }
+        } else {
+            $this->email = $email;
+        }
+
+        $this->clearUserId();
 
         return $this;
     }
@@ -194,16 +216,34 @@ class UserModel implements \JsonSerializable
      */
     public function setNewEmail(string $email, $sanitize = true)
     {
-        if ($email !== '') {
-            if ($sanitize) {
-                if (($email = $this->cleanser->email->sanitize($email)) === false) {
-                    trigger_error("Email sanitization of $email failed", E_USER_WARNING);
-                    return $this;
-                }
-            }
-            $this->new_email = $email;
-        } else {
+        if ($email === '') {
             trigger_error("Invalid email", E_USER_WARNING);
+            return $this;
+        }
+
+        if ($sanitize) {
+            $originalEmail = $email;
+            $cleanedEmail = $this->cleanser->email->sanitize($email);
+
+            if ($cleanedEmail === false) {
+                $this->new_email = $originalEmail;
+                $this->setTags(self::EMAIL_REJECTED);
+                $this->removeTags(self::EMAIL_CLEANED . ',' . self::EMAIL_VALIDATED);
+                trigger_error("Email sanitization of $originalEmail failed", E_USER_WARNING);
+                return $this;
+            }
+
+            if ($cleanedEmail === $originalEmail) {
+                $this->new_email = $originalEmail;
+                $this->setTags(self::EMAIL_VALIDATED);
+                $this->removeTags(self::EMAIL_REJECTED . ',' . self::EMAIL_CLEANED);
+            } else {
+                $this->new_email = $cleanedEmail;
+                $this->setTags(self::EMAIL_VALIDATED . ',' . self::EMAIL_CLEANED);
+                $this->removeTags(self::EMAIL_REJECTED);
+            }
+        } else {
+            $this->new_email = $email;
         }
 
         return $this;

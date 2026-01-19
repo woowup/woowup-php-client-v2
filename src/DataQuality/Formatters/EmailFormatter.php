@@ -11,7 +11,6 @@ class EmailFormatter
      * @var CharacterCleanser
      */
     private $characterCleanser;
-    private const INVALID_EMAIL_REPLACEMENT = 'noemail@noemail.com';
     public function __construct()
     {
         $this->characterCleanser = new CharacterCleanser();
@@ -20,7 +19,8 @@ class EmailFormatter
     public function clean(string $email): string
     {
         if ($this->hasInvalidSpanishChars($email)) {
-            return self::INVALID_EMAIL_REPLACEMENT;
+            // Devolvemos vacío para que el caller trate el email como inválido.
+            return '';
         }
 
         $email = $this->characterCleanser->removeAccents($email);

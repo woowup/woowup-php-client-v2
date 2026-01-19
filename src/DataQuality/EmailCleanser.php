@@ -2,8 +2,8 @@
 
 namespace WoowUpV2\DataQuality;
 
-use Mailcheck\Mailcheck as Mailcheck;
 use WoowUpV2\DataQuality\Formatters\EmailFormatter;
+use WoowUpV2\DataQuality\Validators\GenericEmailValidator;
 use WoowUpV2\DataQuality\Validators\LengthValidator;
 use WoowUpV2\DataQuality\Validators\RepeatedValidator;
 use WoowUpV2\DataQuality\Validators\SequenceValidator;
@@ -21,10 +21,23 @@ class EmailCleanser
         'gemail', 'gaiml', 'gail', 'gmailcom', 'gmailcomcom',
     ];
 
+    // Dominios conocidos que NO deben mezclarse con Gmail
+    // Si detectamos múltiples dominios en el mismo email, no corregimos a Gmail
+    const KNOWN_DOMAINS = [
+        'hotmail', 'hot', 'outlook', 'yahoo', 'live', 'msn', 'aol',
+        'icloud', 'me', 'mac', 'protonmail', 'proton', 'zoho',
+    ];
+
     /**
      * @var EmailFormatter
      */
     private $formatter;
+
+    /**
+     * @var array Array of ValidatorInterface instances
+     */
+    private $validators;
+
     private $emailUser;
     private $emailDomain;
 
@@ -34,7 +47,8 @@ class EmailCleanser
         $this->validators = [
             new LengthValidator(6, 30),
             new RepeatedValidator(8, false),
-            new SequenceValidator(7, false)
+            new SequenceValidator(7, false),
+            new GenericEmailValidator(),
         ];
         $this->emailDomain = null;
 	    $this->emailUser   = null;
@@ -42,27 +56,58 @@ class EmailCleanser
 
 	public function sanitize($email)
 	{
-        $this->extractEmailParts($email);
-
-        if ($this->emailUser !== null || $this->emailDomain !== null) {
-            $this->emailUser  = strtolower(trim($this->emailUser));
-        }
-
-        $cleanedUserEmail = $this->formatter->clean($this->emailUser);
-
-        if ($cleanedUserEmail === '') {
+        // Normalizamos el tipo de entrada 
+        if (!is_string($email) && !is_numeric($email)) {
             return false;
         }
 
-        $this->emailUser = $cleanedUserEmail;
-        $sanitizedEmail =  $cleanedUserEmail.$this->emailDomain;
+        $email = (string) $email;
+        $email = trim($email);
 
-        return self::prettify($sanitizedEmail);
+        if ($email === '') {
+            return false;
+        }
+
+        $this->extractEmailParts($email);
+
+        // Si no pudimos extraer partes válidas, el email es inválido
+        if ($this->emailUser === null || $this->emailDomain === null) {
+            return false;
+        }
+
+        $isGmail = ($this->emailDomain === '@gmail.com');
+
+        if ($isGmail) {
+            // Si es Gmail (o variante mal escrita), aplicar limpieza profunda
+            $this->emailUser = mb_strtolower(trim((string) $this->emailUser));
+            $cleanedUserEmail = $this->formatter->clean((string) $this->emailUser);
+
+            if ($cleanedUserEmail === '') {
+                return false;
+            }
+
+            // Guardamos el user ya formateado aunque luego falle validación, para inspección
+            $this->emailUser = $cleanedUserEmail;
+
+            // Validar el email user limpio con todos los validadores
+            foreach ($this->validators as $validator) {
+                if (!$validator->validate($cleanedUserEmail)) {
+                    return false;
+                }
+            }
+
+            $sanitizedEmail = $cleanedUserEmail . '@gmail.com';
+        } else {
+            $sanitizedEmail = $this->prettify($email);
+            $this->emailUser = mb_strtolower(trim((string) $this->emailUser));
+        }
+
+        return $sanitizedEmail;
 	}
 
 	public function validate($email)
 	{
-		return ((filter_var($email, FILTER_VALIDATE_EMAIL) !== false) && (strpos($email, "@noemail.com") === false));
+		return (filter_var($email, FILTER_VALIDATE_EMAIL) !== false);
 	}
 
 	public function prettify($email)
@@ -84,18 +129,82 @@ class EmailCleanser
 
     protected function extractEmailParts(string $email): void
     {
-        foreach (self::GMAIL_DOMAIN as $knownDomain) {
-            $pos = strpos($email, $knownDomain);
+        $email = trim($email);
+
+        if ($email === '') {
+            $this->emailUser   = null;
+            $this->emailDomain = null;
+            return;
+        }
+
+        $lowerEmail = mb_strtolower($email);
+        $atPos = strpos($email, '@');
+
+        // Si hay @, extraemos la parte del dominio
+        $domainPart = ($atPos !== false) ? substr($lowerEmail, $atPos) : $lowerEmail;
+
+        // 1) Verificar si hay múltiples dominios conocidos mezclados
+        // Si detectamos Gmail + otro dominio conocido, no corregimos (dejamos tal cual)
+        // Esto evita casos como: valentina@gmailhotmail.com, valentiana@yahoogmail.com, etc.
+        $foundGmail = false;
+        $foundOtherDomain = false;
+
+        // Buscar Gmail (o variantes)
+        foreach (self::GMAIL_DOMAINS as $gmailDomain) {
+            if (strpos($domainPart, $gmailDomain) !== false) {
+                $foundGmail = true;
+                break;
+            }
+        }
+
+        // Buscar otros dominios conocidos
+        if ($foundGmail) {
+            foreach (self::KNOWN_DOMAINS as $knownDomain) {
+                if (strpos($domainPart, $knownDomain) !== false) {
+                    $foundOtherDomain = true;
+                    break;
+                }
+            }
+        }
+
+        // Si hay Gmail Y otro dominio conocido mezclados, dejarlo tal cual
+        if ($foundGmail && $foundOtherDomain) {
+            if ($atPos !== false) {
+                $this->emailUser   = substr($email, 0, $atPos);
+                $this->emailDomain = substr($email, $atPos);
+            } else {
+                $this->emailUser   = null;
+                $this->emailDomain = null;
+            }
+            return;
+        }
+
+        // 2) Intentamos detectar dominios de Gmail mal escritos o variantes
+        // Solo si NO hay otros dominios mezclados
+        foreach (self::GMAIL_DOMAINS as $knownDomain) {
+            $pos = strpos($lowerEmail, $knownDomain);
             if ($pos !== false) {
-                // Lo de la izquierda es user
-                $this->emailUser   = substr($email, 0, $pos);
-                // La coincidencia y lo que sigue es domain
+                if ($atPos !== false && $atPos < $pos) {
+                    // Caso típico: usuario@gmial.com, usuario@gmail.com.com, etc.
+                    $this->emailUser = substr($email, 0, $atPos);
+                } else {
+                    // Caso sin @ pero con "gmail"/typo en el string: usuariogmial.com, usuario gmail com
+                    $this->emailUser = substr($email, 0, $pos);
+                }
+
                 $this->emailDomain = '@gmail.com';
                 return;
             }
         }
 
-        // Si no hay @ válido ni coincidencia de dominio
+        // 3) Si no es Gmail ni variante, usamos el @ "normal" si existe
+        if ($atPos !== false) {
+            $this->emailUser   = substr($email, 0, $atPos);
+            $this->emailDomain = substr($email, $atPos);
+            return;
+        }
+
+        // 4) Si no encontramos nada reconocible, marcamos como inválido
         $this->emailUser   = null;
         $this->emailDomain = null;
     }
