@@ -2,6 +2,12 @@
 
 namespace WoowUpV2\DataQuality\Validators;
 
+/**
+ * Validates that email doesn't contain generic/invalid terms.
+ *
+ * Rejects emails containing terms like 'test', 'example', 'noemail', etc.
+ */
+
 class GenericEmailValidator
 {
     private const GENERIC_EMAILS = [
@@ -36,6 +42,12 @@ class GenericEmailValidator
         'noreply',
     ];
 
+    /**
+     * Validates that email doesn't contain generic/invalid terms.
+     *
+     * @param string $email The email to validate
+     * @return bool true if valid (no generic terms found), false otherwise
+     */
     public function validate(string $email): bool
     {
         return !array_filter(
