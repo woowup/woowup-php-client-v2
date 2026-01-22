@@ -1,6 +1,6 @@
 <?php
 
-namespace WoowUpV2\DataQuality\Telephone;
+namespace WoowUpV2\DataQuality\Formatters;
 
 use WoowUpV2\DataQuality\CharacterCleanser;
 

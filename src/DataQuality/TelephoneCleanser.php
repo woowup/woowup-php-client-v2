@@ -2,14 +2,12 @@
 
 namespace WoowUpV2\DataQuality;
 
-use WoowUpV2\DataQuality\Telephone\TelephoneFormatter;
-use WoowUpV2\DataQuality\Validators\ConsecutiveDigitsValidator;
+use WoowUpV2\DataQuality\Formatters\TelephoneFormatter;
 use WoowUpV2\DataQuality\Validators\GenericPhoneValidator;
 use WoowUpV2\DataQuality\Validators\LengthValidator;
 use WoowUpV2\DataQuality\Validators\NumericValidator;
-use WoowUpV2\DataQuality\Validators\RepeatedDigitsValidator;
-use WoowUpV2\DataQuality\Validators\SequentialDigitsValidator;
-use WoowUpV2\DataQuality\Validators\TwoSequentialDigitsValidator;
+use WoowUpV2\DataQuality\Validators\RepeatedValidator;
+use WoowUpV2\DataQuality\Validators\SequenceValidator;
 
 /**
  * Telephone number sanitizer and validator
@@ -38,9 +36,8 @@ class TelephoneCleanser
 		$this->validators = [
 			new NumericValidator(),
 			new LengthValidator(8, 15), // min: 8, max: 15 (E.164 standard)
-			new RepeatedDigitsValidator(), // 5+ same digits: 5555532423
-			new ConsecutiveDigitsValidator(), // 6+ consecutive: 11111111111
-			new SequentialDigitsValidator(), // 9+ sequential patterns: 987654321, 1234567890
+			new RepeatedValidator(5, true), // 5+ same digits: 5555532423
+			new SequenceValidator(8, true), // 9+ sequential patterns: 987654321, 1234567890
 			new GenericPhoneValidator(), // Known generic/placeholder numbers
 		];
 

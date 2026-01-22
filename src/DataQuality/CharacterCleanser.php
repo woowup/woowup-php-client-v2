@@ -78,4 +78,16 @@ class CharacterCleanser
 	{
 		return trim(preg_replace('/\s+/', ' ', $input));
 	}
+
+    /**
+     * Replace accented characters with their non-accented equivalents
+     *
+     * @param string $text Input string
+     * @return string String with accents removed
+     */
+    public function removeAccents(string $text): string
+    {
+        $normalized = \Normalizer::normalize($text, \Normalizer::FORM_D);
+        return preg_replace('/\p{Mn}/u', '', $normalized);
+    }
 }

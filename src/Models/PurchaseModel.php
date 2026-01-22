@@ -16,7 +16,7 @@ class PurchaseModel implements \JsonSerializable
     const CHANNEL_CORPORATE = "corporate";
     const CHANNEL_DIRECT = "direct";
     const CHANNEL_OTHER = "other";
-    
+
     private $invoice_number;
     private $service_uid;
     private $email;
@@ -192,21 +192,31 @@ class PurchaseModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setEmail(string $email, $sanitize = true)
+    public function setEmail(string $email, $sanitize = false)
     {
-        if ((is_string($email) && (strlen($email) > 0)) || is_null($email)) {
-            if ($sanitize) {
-                if (($email = $this->cleanser->email->sanitize($email)) === false) {
-                    trigger_error("Email sanitization of $email failed", E_USER_WARNING);
-                    $email = null;
-                }
-            }
-            $this->email = $email;
-
-            $this->clearUserId();
-        } else {
+        if ($email === '') {
             trigger_error("Invalid email", E_USER_WARNING);
+            return $this;
         }
+
+        if ($sanitize) {
+            $originalEmail = $email;
+            $cleanedEmail = $this->cleanser->email->sanitize($email);
+
+            if ($cleanedEmail === false || $cleanedEmail === 'noemail@noemail.com') {
+                // Keep original email if sanitization fails
+                $this->email = $originalEmail;
+                trigger_error("Email sanitization of $originalEmail failed", E_USER_WARNING);
+                $this->clearUserId();
+                return $this;
+            }
+
+            $this->email = $cleanedEmail;
+        } else {
+            $this->email = $email;
+        }
+
+        $this->clearUserId();
 
         return $this;
     }
