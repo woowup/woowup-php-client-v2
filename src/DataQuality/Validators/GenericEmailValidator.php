@@ -8,7 +8,7 @@ namespace WoowUpV2\DataQuality\Validators;
  * Rejects emails containing terms like 'test', 'example', 'noemail', etc.
  */
 
-class GenericEmailValidator
+class GenericEmailValidator implements ValidatorInterface
 {
     private const GENERIC_EMAILS = [
         'correo',

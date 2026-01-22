@@ -9,9 +9,15 @@ use WoowUpV2\DataQuality\Validators\RepeatedValidator;
 use WoowUpV2\DataQuality\Validators\SequenceValidator;
 
 /**
- * Cleans, normalizes and validates email addresses.
+ * Email address sanitizer and validator
  *
- * Handles Gmail typo detection, VTEX email cleaning, and rejects emails with mixed domains.
+ * Process flow:
+ * 1. Type validation and normalization
+ * 2. Clean VTEX platform emails
+ * 3. Extract user and domain parts
+ * 4. Detect and reject mixed domains (Gmail + other provider)
+ * 5. Correct Gmail typos and validate Gmail users
+ * 6. Return sanitized email or false if invalid
  */
 class EmailCleanser
 {
