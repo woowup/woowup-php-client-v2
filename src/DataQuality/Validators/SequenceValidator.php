@@ -86,6 +86,12 @@ class SequenceValidator implements ValidatorInterface
         $length = strlen($input);
 
         for ($i = 1; $i < $length; $i++) {
+            // Only count sequences of actual digits
+            if (!ctype_digit($input[$i]) || !ctype_digit($input[$i - 1])) {
+                $sequenceCount = 1;
+                continue;
+            }
+
             $current = (int) $input[$i];
             $previous = (int) $input[$i - 1];
 
