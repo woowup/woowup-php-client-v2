@@ -6,19 +6,22 @@ use WoowUpV2\DataQuality\EmailCleanser as EmailCleanser;
 use WoowUpV2\DataQuality\NamesCleanser as NamesCleanser;
 use WoowUpV2\DataQuality\TelephoneCleanser as TelephoneCleanser;
 use WoowUpV2\DataQuality\StreetCleanser as StreetCleanser;
+use WoowUpV2\DataQuality\GenderCleanser as GenderCleanser;
 
 class DataCleanser
 {
-	public $email;
-	public $names;
-	public $telephone;
-	public $street;
+    public $email;
+    public $names;
+    public $telephone;
+    public $street;
+    public $gender;
 
-	public function __construct()
-	{
-		$this->email     = new EmailCleanser();
-		$this->names     = new NamesCleanser();
-		$this->telephone = new TelephoneCleanser();
-		$this->street    = new StreetCleanser();
-	}
+    public function __construct()
+    {
+        $this->email     = new EmailCleanser();
+        $this->names     = new NamesCleanser();
+        $this->telephone = new TelephoneCleanser();
+        $this->street    = new StreetCleanser();
+        $this->gender    = new GenderCleanser();
+    }
 }
