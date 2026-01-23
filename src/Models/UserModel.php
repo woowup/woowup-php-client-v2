@@ -412,17 +412,20 @@ class UserModel implements \JsonSerializable
     /**
      * Set gender
      * @param mixed $gender
+     * @param bool $sanitize Whether to sanitize the gender value
      *
      * @return self
      */
     public function setGender(string $gender)
     {
-        if (($gender === self::FEMALE_GENDER_VALUE) || ($gender === self::MALE_GENDER_VALUE)) {
-            $this->gender = $gender;
-        } else {
+        $cleanedGender = $this->cleanser->gender->sanitize($gender);
+
+        if ($cleanedGender === null) {
             trigger_error("Invalid gender", E_USER_WARNING);
+            return $this;
         }
 
+        $this->gender = $cleanedGender;
         return $this;
     }
 
