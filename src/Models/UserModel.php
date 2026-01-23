@@ -416,7 +416,7 @@ class UserModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setGender(string $gender, $sanitize = false)
+    public function setGender(string $gender)
     {
         $cleanedGender = $this->cleanser->gender->sanitize($gender);
 
