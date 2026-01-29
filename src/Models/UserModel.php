@@ -391,12 +391,24 @@ class UserModel implements \JsonSerializable
     /**
      * Set birthdate
      * @param mixed $birthdate
+     * @param bool $sanitize Whether to sanitize the birthdate value (default: true)
      *
      * @return self
      */
-    public function setBirthdate($birthdate)
+    public function setBirthdate($birthdate, $sanitize = true)
     {
-        $this->birthdate = $birthdate;
+        if ($sanitize) {
+            $cleanedBirthdate = $this->cleanser->birthdate->sanitize($birthdate);
+
+            if ($cleanedBirthdate === null) {
+                return $this;
+            }
+
+            $this->birthdate = $cleanedBirthdate;
+        } else {
+            $this->birthdate = $birthdate;
+        }
+
         return $this;
     }
 
