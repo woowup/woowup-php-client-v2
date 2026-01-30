@@ -216,7 +216,6 @@ class UserModel implements \JsonSerializable
                     $this->email = $originalEmail;
                 }
             } else {
-                $this->setTags(self::EMAIL_VALIDATED);
                 $this->removeTags(self::EMAIL_REJECTED);
 
                 if ($originalEmail !== $cleanedEmail) {
@@ -224,6 +223,7 @@ class UserModel implements \JsonSerializable
                     $this->setTags(self::EMAIL_CLEANED);
                 } else {
                     $this->email = $originalEmail;
+                    $this->setTags(self::EMAIL_VALIDATED);
                     $this->removeTags(self::EMAIL_CLEANED);
                 }
             }
