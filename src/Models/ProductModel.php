@@ -359,7 +359,7 @@ class ProductModel implements \JsonSerializable
      */
     public function getCustomAttributes()
     {
-        return $this->custom_attributes;
+        return $this->custom_attributes ?? null;
     }
 
     /**
