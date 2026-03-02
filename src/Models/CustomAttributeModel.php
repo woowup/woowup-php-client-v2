@@ -14,6 +14,7 @@ class CustomAttributeModel implements \JsonSerializable
     const FIELD_TYPE_TEXT     = 'text';
     const FIELD_TYPE_SELECT   = 'select';
     const FIELD_TYPE_DATETIME = 'datetime';
+    const FIELD_TYPE_CHECKBOX = 'checkbox';
 
     private $name;
     private $data_type;
@@ -173,6 +174,7 @@ class CustomAttributeModel implements \JsonSerializable
             self::FIELD_TYPE_TEXT,
             self::FIELD_TYPE_SELECT,
             self::FIELD_TYPE_DATETIME,
+            self::FIELD_TYPE_CHECKBOX,
         ];
 
         if (in_array($field_type, $validValues)) {
