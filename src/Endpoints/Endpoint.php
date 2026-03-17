@@ -8,14 +8,14 @@ use WoowUpV2\Models;
  */
 class Endpoint
 {
-    const HTTP_OK               = 200;
-    const HTTP_CREATED          = 201;
-    const HTTP_TOO_MANY_REQUEST    = 429;
+    const HTTP_OK                  = 200;
+    const HTTP_CREATED             = 201;
     const HTTP_BAD_REQUEST         = 403;
     const HTTP_NOT_FOUND           = 404;
+    const HTTP_GONE                = 410;
+    const HTTP_TOO_MANY_REQUEST    = 429;
     const HTTP_BAD_GATEWAY         = 502;
     const HTTP_SERVICE_UNAVAILABLE = 503;
-
     const MAX_ATTEMPTS  = 25;
     const MAX_SLEEP_SEC = 60;
 
@@ -142,7 +142,6 @@ class Endpoint
         ]);
     }
 
-
     protected function delete($url)
     {
         return $this->request('DELETE', $url, [
@@ -165,13 +164,22 @@ class Endpoint
             try {
                 return $this->http->request($verb, $url, $params);
             } catch (\GuzzleHttp\Exception\RequestException $e) {
-                if ($e->hasResponse() && in_array($e->getResponse()->getStatusCode(), self::$retryResponses) && $attempts <= self::MAX_ATTEMPTS) {
-                    // sleep 1, 2, 4, 8, ... seconds
-                    sleep(min(pow(2, $attempts), self::MAX_SLEEP_SEC));
-                    $attempts++;
-                } else {
+                if (!$e->hasResponse()) {
                     throw $e;
                 }
+                $response   = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                if (!in_array($statusCode, self::$retryResponses)) {
+                    throw $e;
+                }
+                if ($statusCode === self::HTTP_TOO_MANY_REQUEST) {
+                    $retryAfter = (int) $response->getHeaderLine('Retry-After');
+                    $sleepSec = $retryAfter > 0 ? $retryAfter : min(pow(2, $attempts), self::MAX_SLEEP_SEC);
+                } else {
+                    $sleepSec = min(pow(2, $attempts), self::MAX_SLEEP_SEC);
+                }
+                sleep((int) $sleepSec);
+                $attempts++;
             }
         }
 
