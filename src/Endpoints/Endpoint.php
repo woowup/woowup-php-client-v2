@@ -16,8 +16,7 @@ class Endpoint
     const HTTP_TOO_MANY_REQUEST    = 429;
     const HTTP_BAD_GATEWAY         = 502;
     const HTTP_SERVICE_UNAVAILABLE = 503;
-    const MAX_ATTEMPTS  = 25;
-    const MAX_SLEEP_SEC = 60;
+    const MAX_ATTEMPTS  = 3;
 
     protected static $retryResponses = [
         self::HTTP_TOO_MANY_REQUEST,
@@ -197,13 +196,9 @@ class Endpoint
     private function calculateSleep(int $statusCode, $response, int $attempts): int
     {
         if ($statusCode === self::HTTP_TOO_MANY_REQUEST) {
-            $retryAfter = (int) $response->getHeaderLine('Retry-After');
-            if ($retryAfter > 0) {
-                return min($retryAfter, self::MAX_SLEEP_SEC);
-            }
+            return (int) $response->getHeaderLine('Retry-After');
         }
-
-        return (int) min(pow(2, $attempts), self::MAX_SLEEP_SEC);
+        return (int) pow(2, $attempts);
     }
 
     protected function encode($string)
