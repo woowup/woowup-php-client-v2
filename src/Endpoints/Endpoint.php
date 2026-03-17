@@ -154,7 +154,21 @@ class Endpoint
 
     protected function requestAsync($verb, $url, $params)
     {
-        return $this->http->requestAsync($verb, $url, $params);
+        $attempts = 0;
+        return $this->http->requestAsync($verb, $url, $params)->otherwise(
+            function ($e) use ($verb, $url, $params, $attempts) {
+                if (!$e instanceof \GuzzleHttp\Exception\RequestException || !$e->hasResponse()) {
+                    throw $e;
+                }
+                $response   = $e->getResponse();
+                $statusCode = $response->getStatusCode();
+                if (!in_array($statusCode, self::$retryResponses) || $attempts >= self::MAX_ATTEMPTS) {
+                    throw $e;
+                }
+                sleep($this->calculateSleep($statusCode, $response, $attempts));
+                return $this->requestAsync($verb, $url, $params);
+            }
+        );
     }
 
     protected function request($verb, $url, $params)
@@ -172,18 +186,24 @@ class Endpoint
                 if (!in_array($statusCode, self::$retryResponses)) {
                     throw $e;
                 }
-                if ($statusCode === self::HTTP_TOO_MANY_REQUEST) {
-                    $retryAfter = (int) $response->getHeaderLine('Retry-After');
-                    $sleepSec = $retryAfter > 0 ? $retryAfter : min(pow(2, $attempts), self::MAX_SLEEP_SEC);
-                } else {
-                    $sleepSec = min(pow(2, $attempts), self::MAX_SLEEP_SEC);
-                }
-                sleep((int) $sleepSec);
+                sleep($this->calculateSleep($statusCode, $response, $attempts));
                 $attempts++;
             }
         }
 
         throw new \Exception("Max request attempts reached");
+    }
+
+    private function calculateSleep(int $statusCode, $response, int $attempts): int
+    {
+        if ($statusCode === self::HTTP_TOO_MANY_REQUEST) {
+            $retryAfter = (int) $response->getHeaderLine('Retry-After');
+            if ($retryAfter > 0) {
+                return min($retryAfter, self::MAX_SLEEP_SEC);
+            }
+        }
+
+        return (int) min(pow(2, $attempts), self::MAX_SLEEP_SEC);
     }
 
     protected function encode($string)
