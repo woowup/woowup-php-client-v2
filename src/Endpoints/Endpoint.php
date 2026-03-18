@@ -17,7 +17,8 @@ class Endpoint
     const HTTP_BAD_GATEWAY         = 502;
     const HTTP_SERVICE_UNAVAILABLE = 503;
 
-    const MAX_ATTEMPTS = 25;
+    const MAX_ATTEMPTS  = 25;
+    const MAX_SLEEP_SEC = 60;
 
     protected static $retryResponses = [
         self::HTTP_TOO_MANY_REQUEST,
@@ -218,7 +219,7 @@ class Endpoint
             }
         }
 
-        return (int) pow(2, $attempts);
+        return min((int) pow(2, $attempts), self::MAX_SLEEP_SEC);
     }
 
     protected function encode($string)
