@@ -16,7 +16,7 @@ class Endpoint
     const HTTP_TOO_MANY_REQUEST    = 429;
     const HTTP_BAD_GATEWAY         = 502;
     const HTTP_SERVICE_UNAVAILABLE = 503;
-    const MAX_ATTEMPTS  = 3;
+    const MAX_ATTEMPTS  = 25;
 
     protected static $retryResponses = [
         self::HTTP_TOO_MANY_REQUEST,
@@ -154,20 +154,22 @@ class Endpoint
     protected function requestAsync($verb, $url, $params)
     {
         $attempts = 0;
-        return $this->http->requestAsync($verb, $url, $params)->otherwise(
-            function ($e) use ($verb, $url, $params, $attempts) {
-                if (!$e instanceof \GuzzleHttp\Exception\RequestException || !$e->hasResponse()) {
-                    throw $e;
-                }
-                $response   = $e->getResponse();
-                $statusCode = $response->getStatusCode();
-                if (!in_array($statusCode, self::$retryResponses) || $attempts >= self::MAX_ATTEMPTS) {
-                    throw $e;
-                }
-                sleep($this->calculateSleep($statusCode, $response, $attempts));
-                return $this->requestAsync($verb, $url, $params);
+
+        $retry = function ($e) use ($verb, $url, $params, &$attempts, &$retry) {
+            if (!$e instanceof \GuzzleHttp\Exception\RequestException || !$e->hasResponse()) {
+                throw $e;
             }
-        );
+            $response   = $e->getResponse();
+            $statusCode = $response->getStatusCode();
+            if (!in_array($statusCode, self::$retryResponses) || $attempts >= self::MAX_ATTEMPTS) {
+                throw $e;
+            }
+            sleep($this->calculateSleep($statusCode, $response, $attempts));
+            $attempts++;
+            return $this->http->requestAsync($verb, $url, $params)->otherwise($retry);
+        };
+
+        return $this->http->requestAsync($verb, $url, $params)->otherwise($retry);
     }
 
     protected function request($verb, $url, $params)
