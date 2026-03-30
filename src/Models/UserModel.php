@@ -173,7 +173,7 @@ class UserModel implements \JsonSerializable
      * Set email
      * @param string $email [description]
      */
-    public function setEmail(string $email, $sanitize = false)
+    public function setEmail(string $email, $sanitize = false, bool $disableIdNoemail = false)
     {
         if ($email === '') {
             trigger_error("Invalid email", E_USER_WARNING);
@@ -189,10 +189,10 @@ class UserModel implements \JsonSerializable
                 $this->removeTags(self::EMAIL_CLEANED . ',' . self::EMAIL_VALIDATED);
 
                 if ($cleanedEmail === self::INVALID_EMAIL) {
-                    $localPart = $this->document
+                    $localPart = $disableIdNoemail ? null : ($this->document
                         ?? $this->service_uid
                         ?? $this->telephone
-                        ?? null;
+                        ?? null);
 
                     $this->email = $localPart
                         ? $localPart . '@noemail.com'
