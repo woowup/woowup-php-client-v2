@@ -10,6 +10,8 @@ use WoowUpV2\Models\SellerModel as Seller;
 
 class PurchaseModel implements \JsonSerializable
 {
+    const INVALID_EMAIL = 'noemail@noemail.com';
+
     const CHANNEL_WEB = "web";
     const CHANNEL_TELEPHONE = "telephone";
     const CHANNEL_IN_STORE = "in-store";
@@ -192,7 +194,7 @@ class PurchaseModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setEmail(string $email, $sanitize = false)
+    public function setEmail(string $email, $sanitize = false, bool $disableIdNoemail = false)
     {
         if ($email === '') {
             trigger_error("Invalid email", E_USER_WARNING);
@@ -203,9 +205,20 @@ class PurchaseModel implements \JsonSerializable
             $originalEmail = $email;
             $cleanedEmail = $this->cleanser->email->sanitize($email);
 
-            if ($cleanedEmail === false || $cleanedEmail === 'noemail@noemail.com') {
-                // Keep original email if sanitization fails
-                $this->email = $originalEmail;
+            if ($cleanedEmail === false || $cleanedEmail === self::INVALID_EMAIL) {
+                if ($cleanedEmail === self::INVALID_EMAIL) {
+                    $localPart = $disableIdNoemail ? null : ($this->document
+                        ?? $this->service_uid
+                        ?? $this->telephone
+                        ?? null);
+
+                    $this->email = $localPart
+                        ? $localPart . '@noemail.com'
+                        : self::INVALID_EMAIL;
+                } else {
+                    $this->email = $originalEmail;
+                }
+
                 trigger_error("Email sanitization of $originalEmail failed", E_USER_WARNING);
                 $this->clearUserId();
                 return $this;
