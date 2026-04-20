@@ -13,9 +13,9 @@ class Users extends Endpoint
         'telephone'   => ''
     ];
 
-    public function __construct($host, $apikey)
+    public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http = null)
     {
-        parent::__construct($host, $apikey);
+        parent::__construct($host, $apikey, $http);
     }
 
     public function update(\WoowUpV2\Models\UserModel $user)

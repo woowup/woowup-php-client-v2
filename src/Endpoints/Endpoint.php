@@ -30,6 +30,12 @@ class Endpoint
     protected $apikey;
     protected $http;
 
+    private static $requestCounts = [];
+
+    public static function getRequestCount(): int { return array_sum(self::$requestCounts); }
+    public static function getRequestCounts(): array { return self::$requestCounts; }
+    public static function resetRequestCount(): void { self::$requestCounts = []; }
+
     public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http = null)
     {
         $this->host   = $host;
@@ -171,6 +177,8 @@ class Endpoint
 
     protected function request($verb, $url, $params)
     {
+        $class = static::class;
+        self::$requestCounts[$class] = (self::$requestCounts[$class] ?? 0) + 1;
         $attempts = 0;
 
         while ($attempts < self::MAX_ATTEMPTS) {
