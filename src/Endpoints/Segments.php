@@ -3,9 +3,9 @@ namespace WoowUpV2\Endpoints;
 
 class Segments extends Endpoint
 {
-    public function __construct($host, $apikey)
+    public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http = null)
     {
-        parent::__construct($host, $apikey);
+        parent::__construct($host, $apikey, $http);
     }
 
     public function find($segmentId, $params = [])
