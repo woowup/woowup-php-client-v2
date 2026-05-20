@@ -31,12 +31,12 @@ class CustomAttributes extends Endpoint
         return false;
     }
 
-    public function updateAttributeDefinition($data, $entity)
+    public function updateAttributeDefinition($data, $entity, string $oldName = null)
     {
-    	$response = $this->put($this->host . '/account/' . self::ENTITIES[$entity] . '/' . $data->name, $data);
+        $name = $oldName ?? $data->name;
+    	$response = $this->put($this->host . '/account/' . self::ENTITIES[$entity] . '/' . $name, $data);
 
     	return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
-
     }
 
     public function create(\WoowUpV2\Models\CustomAttributeModel $customAttribute, $entity)
