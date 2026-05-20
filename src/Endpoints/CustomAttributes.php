@@ -39,6 +39,13 @@ class CustomAttributes extends Endpoint
 
     }
 
+    public function renameAttributeDefinition(string $oldName, $data, string $entity): bool
+    {
+        $response = $this->put($this->host . '/account/' . self::ENTITIES[$entity] . '/' . $oldName, $data);
+
+        return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
+    }
+
     public function create(\WoowUpV2\Models\CustomAttributeModel $customAttribute, $entity)
     {
         if ($customAttribute->validate()) {
