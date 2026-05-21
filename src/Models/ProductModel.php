@@ -386,8 +386,9 @@ class ProductModel implements \JsonSerializable
      */
     public function addCustomAttribute($key, $value)
     {
-        if (!empty(trim((string) $key))) {
-            $normalizedKey = $this->cleanser->customAttributes->normalizeName((string) $key);
+        $trimmedKey = trim((string) $key);
+        if (!empty($trimmedKey)) {
+            $normalizedKey = $this->cleanser->customAttributes->normalizeName($trimmedKey);
             if ($normalizedKey === '') {
                 trigger_error("Not valid key for custom_attribute after normalization", E_USER_WARNING);
                 return $this;
