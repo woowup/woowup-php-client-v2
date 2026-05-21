@@ -390,7 +390,8 @@ class ProductModel implements \JsonSerializable
             if (!isset($this->custom_attributes)) {
                 $this->custom_attributes = new \stdClass();
             }
-            $this->custom_attributes->{$key} = $value;
+            $normalizedKey = $this->cleanser->customAttributes->normalizeName((string) $key);
+            $this->custom_attributes->{$normalizedKey} = $value;
         } else {
             trigger_error("Not valid key for custom_attribute", E_USER_WARNING);
         }
