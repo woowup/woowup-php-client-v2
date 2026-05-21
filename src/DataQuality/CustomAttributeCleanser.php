@@ -20,7 +20,9 @@ class CustomAttributeCleanser
 	 */
 	public function normalizeName(string $name): string
 	{
-		$noAccents = preg_replace('/\p{Mn}/u', '', \Normalizer::normalize($name, \Normalizer::FORM_D));
+		$name       = trim($name);
+		$normalized = \Normalizer::normalize($name, \Normalizer::FORM_D) ?: $name;
+		$noAccents  = preg_replace('/\p{Mn}/u', '', $normalized) ?? $name;
 		return str_replace([' ', '-'], '_', mb_strtolower($noAccents));
 	}
 
@@ -37,7 +39,11 @@ class CustomAttributeCleanser
 	{
 		$result = [];
 		foreach ($attributes as $name => $value) {
-			$result[$this->normalizeName((string) $name)] = $value;
+			$trimmed = trim((string) $name);
+			if ($trimmed === '') {
+				continue;
+			}
+			$result[$this->normalizeName($trimmed)] = $value;
 		}
 		return $result;
 	}
