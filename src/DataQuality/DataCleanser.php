@@ -8,6 +8,7 @@ use WoowUpV2\DataQuality\TelephoneCleanser as TelephoneCleanser;
 use WoowUpV2\DataQuality\StreetCleanser as StreetCleanser;
 use WoowUpV2\DataQuality\GenderCleanser as GenderCleanser;
 use WoowUpV2\DataQuality\BirthdateCleanser as BirthdateCleanser;
+use WoowUpV2\DataQuality\CustomAttributeCleanser as CustomAttributeCleanser;
 
 class DataCleanser
 {
@@ -17,14 +18,16 @@ class DataCleanser
     public $street;
     public $gender;
     public $birthdate;
+    public $customAttributes;
 
     public function __construct()
     {
-        $this->email     = new EmailCleanser();
-        $this->names     = new NamesCleanser();
-        $this->telephone = new TelephoneCleanser();
-        $this->street    = new StreetCleanser();
-        $this->gender    = new GenderCleanser();
-        $this->birthdate = new BirthdateCleanser();
+        $this->email            = new EmailCleanser();
+        $this->names            = new NamesCleanser();
+        $this->telephone        = new TelephoneCleanser();
+        $this->street           = new StreetCleanser();
+        $this->gender           = new GenderCleanser();
+        $this->birthdate        = new BirthdateCleanser();
+        $this->customAttributes = new CustomAttributeCleanser();
     }
 }
