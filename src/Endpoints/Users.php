@@ -20,6 +20,8 @@ class Users extends Endpoint
 
     public function update(\WoowUpV2\Models\UserModel $user)
     {
+        $this->sanitizeEmail($user);
+
         if (!$user->validate()) {
             throw new \Exception("User is not valid", 1);
         }
@@ -31,6 +33,8 @@ class Users extends Endpoint
 
     public function updateAsync(\WoowUpV2\Models\UserModel $user)
     {
+        $this->sanitizeEmail($user);
+
         if (!$user->validate()) {
             throw new \Exception("User is not valid", 1);
         }
@@ -40,6 +44,8 @@ class Users extends Endpoint
 
     public function create(\WoowUpV2\Models\UserModel $user)
     {
+        $this->sanitizeEmail($user);
+
         if (!$user->validate()) {
             throw new \Exception("User is not valid", 1);
         }
@@ -51,11 +57,21 @@ class Users extends Endpoint
 
     public function createAsync(\WoowUpV2\Models\UserModel $user)
     {
+        $this->sanitizeEmail($user);
+
         if (!$user->validate()) {
             throw new \Exception("User is not valid", 1);
         }
 
         return $this->postAsync($this->host . '/users', $user);
+    }
+
+    private function sanitizeEmail(\WoowUpV2\Models\UserModel $user): void
+    {
+        $email = $user->getEmail();
+        if ($email !== null) {
+            $user->setEmail($email, true);
+        }
     }
 
     public function exist($identity)
