@@ -28,6 +28,7 @@ class UserModel implements \JsonSerializable
         'spamreport',
         'dropped',
         'other',
+        'INVALID_EMAIL',
     ];
 
     const CAN_BE_NULL_FIELDS = [
@@ -1147,9 +1148,19 @@ class UserModel implements \JsonSerializable
                         $user->setSmsDisabledReason($value);
                     }
                     break;
+                case 'sms_enabled_type':
+                    if (isset($value)) {
+                        $user->sms_enabled_type = $value;
+                    }
+                    break;
                 case 'mailing_enabled_reason':
                     if (isset($value)) {
                         $user->setMailingDisabledReason($value);
+                    }
+                    break;
+                case 'whatsapp_enabled_reason':
+                    if (isset($value)) {
+                        $user->setWhatsappDisabledReason($value);
                     }
                     break;
                 case 'custom_attributes':
