@@ -807,7 +807,7 @@ class UserModel implements \JsonSerializable
      */
     public function getMailingDisabledReason()
     {
-        return $this->mailing_disabled_reason;
+        return $this->mailing_disabled_reason ?? null;
     }
 
     /**
@@ -833,7 +833,7 @@ class UserModel implements \JsonSerializable
      */
     public function getSmsDisabledReason()
     {
-        return $this->sms_disabled_reason;
+        return $this->sms_disabled_reason ?? null;
     }
 
     /**
@@ -859,7 +859,7 @@ class UserModel implements \JsonSerializable
      */
     public function getWhatsappDisabledReason()
     {
-        return $this->whatsapp_disabled_reason;
+        return $this->whatsapp_disabled_reason ?? null;
     }
 
     /**
@@ -969,7 +969,7 @@ class UserModel implements \JsonSerializable
      */
     public function getSmsEnabledType()
     {
-        return $this->sms_enabled_type;
+        return $this->sms_enabled_type ?? null;
     }
 
     /**
