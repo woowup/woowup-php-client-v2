@@ -12,6 +12,7 @@ class PurchasePaymentModel implements \JsonSerializable
     const TYPE_CREDIT = 'credit';
     const TYPE_DEBIT = 'debit';
     const TYPE_OTHER = 'other';
+    const TYPE_OTHERS = 'others';
     const TYPE_MP = 'mercadopago';
     const TYPE_TP = 'todopago';
     const TYPE_CASH = 'cash';
@@ -193,6 +194,7 @@ class PurchasePaymentModel implements \JsonSerializable
             self::TYPE_CREDIT,
             self::TYPE_DEBIT,
             self::TYPE_OTHER,
+            self::TYPE_OTHERS,
             self::TYPE_MP,
             self::TYPE_TP,
             self::TYPE_CASH,
