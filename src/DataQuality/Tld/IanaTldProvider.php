@@ -73,7 +73,9 @@ class IanaTldProvider
             return null;
         }
 
-        @file_put_contents($this->cacheFile, json_encode($tlds));
+        $tmp = $this->cacheFile . '.tmp.' . getmypid();
+        @file_put_contents($tmp, json_encode($tlds), LOCK_EX);
+        @rename($tmp, $this->cacheFile);
         return $tlds;
     }
 
