@@ -34,7 +34,9 @@ class IanaTldProvider
             return $this->tlds;
         }
 
-        $this->tlds = $this->loadFromCache() ?? $this->fetchAndCache() ?? self::FALLBACK_TLDS;
+        // Stale-if-error: an expired cache from a past successful fetch is still
+        // far more accurate than the hardcoded fallback list.
+        $this->tlds = $this->loadFromCache() ?? $this->fetchAndCache() ?? $this->readCacheFile() ?? self::FALLBACK_TLDS;
         return $this->tlds;
     }
 
@@ -54,6 +56,15 @@ class IanaTldProvider
         }
 
         if ((time() - filemtime($this->cacheFile)) > $this->ttl) {
+            return null;
+        }
+
+        return $this->readCacheFile();
+    }
+
+    private function readCacheFile(): ?array
+    {
+        if (!file_exists($this->cacheFile)) {
             return null;
         }
 
