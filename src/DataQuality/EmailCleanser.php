@@ -39,6 +39,9 @@ class EmailCleanser
 
     const INVALID_EMAIL = 'noemail@noemail.com';
 
+    // Marketplace-generated proxy addresses, not a real customer inbox.
+    const INVALID_DOMAINS = ['@mail.mercadolibre.com'];
+
     private $formatter;
     private $validators;
     private $emailUser;
@@ -78,6 +81,10 @@ class EmailCleanser
         $this->extractEmailParts($email);
 
         if (!$this->hasValidParts()) {
+            return false;
+        }
+
+        if ($this->isInvalidDomain()) {
             return false;
         }
 
@@ -197,6 +204,11 @@ class EmailCleanser
     private function isGmailDomain(): bool
     {
         return $this->emailDomain === '@gmail.com';
+    }
+
+    private function isInvalidDomain(): bool
+    {
+        return in_array(mb_strtolower($this->emailDomain), self::INVALID_DOMAINS, true);
     }
 
     private function sanitizeGmailEmail()
