@@ -22,9 +22,19 @@ class UserModel implements \JsonSerializable
     const ENABLED_VALUE = "enabled";
     const DISABLED_VALUE = "disabled";
 
+    /**
+     * Eventos de baja canonicos. Queda como referencia para quien los necesite
+     * comparar, pero NO se usa para filtrar lo que llega en el campo: en el
+     * backend `*_enabled_reason` es TEXTO LIBRE de hasta 30 caracteres, no un enum.
+     *
+     * Ante un evento de mailing el backend guarda "{evento}-{fecha}"
+     * (ej. "unsubscribe-2025-10-09 20:55:21"), y si el evento trae su propio
+     * detalle guarda ese texto (ej. "Amazon SES did not send the message").
+     * Ninguno de esos coincide con un valor pelado de esta lista.
+     */
     const DISABLED_REASON_VALUES = [
         'bounce',
-        'unsuscribe',
+        'unsubscribe',
         'spamreport',
         'dropped',
         'other',
@@ -822,11 +832,7 @@ class UserModel implements \JsonSerializable
      */
     public function setMailingDisabledReason($mailing_disabled_reason)
     {
-        if (in_array($mailing_disabled_reason, self::DISABLED_REASON_VALUES)) {
-            $this->mailing_disabled_reason = $mailing_disabled_reason;
-        } else {
-            trigger_error("Invalid mailing_disabled_reason", E_USER_WARNING);
-        }
+        $this->mailing_disabled_reason = $mailing_disabled_reason;
 
         return $this;
     }
@@ -848,11 +854,7 @@ class UserModel implements \JsonSerializable
      */
     public function setSmsDisabledReason($sms_disabled_reason)
     {
-        if (in_array($sms_disabled_reason, self::DISABLED_REASON_VALUES)) {
-            $this->sms_disabled_reason = $sms_disabled_reason;
-        } else {
-            trigger_error("Invalid sms_disabled_reason", E_USER_WARNING);
-        }
+        $this->sms_disabled_reason = $sms_disabled_reason;
 
         return $this;
     }
@@ -874,11 +876,7 @@ class UserModel implements \JsonSerializable
      */
     public function setWhatsappDisabledReason($whatsapp_disabled_reason)
     {
-        if (in_array($whatsapp_disabled_reason, self::DISABLED_REASON_VALUES)) {
-            $this->whatsapp_disabled_reason = $whatsapp_disabled_reason;
-        } else {
-            trigger_error("Invalid whatsapp_disabled_reason", E_USER_WARNING);
-        }
+        $this->whatsapp_disabled_reason = $whatsapp_disabled_reason;
 
         return $this;
     }
