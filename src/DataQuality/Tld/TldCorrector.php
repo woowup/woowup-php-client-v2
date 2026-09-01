@@ -46,6 +46,13 @@ class TldCorrector
     private array $protectedTlds;
     private ?string $newSuffixLog;
 
+    // Tracks provider+tld pairs already written to newSuffixLog this run. Without it,
+    // every already-valid suffix (hotmail.com, yahoo.com — the overwhelming majority of
+    // traffic, not the rare/new ones this log exists to surface) gets appended on every
+    // single matching email: millions of duplicate lines under real volume, all under a
+    // lock (FILE_APPEND | LOCK_EX) that serializes every forked child writing to it.
+    private array $loggedSuffixes = [];
+
     public function __construct(IanaTldProvider $iana, array $config = [])
     {
         $this->iana                  = $iana;
@@ -344,6 +351,12 @@ class TldCorrector
         }
 
         $firstLabel = explode('.', $providerName)[0];
+        $key = $firstLabel . '|' . $tld;
+        if (isset($this->loggedSuffixes[$key])) {
+            return;
+        }
+        $this->loggedSuffixes[$key] = true;
+
         $line = date('Y-m-d H:i:s') . "\t" . $firstLabel . "\t" . $tld . "\n";
         @file_put_contents($this->newSuffixLog, $line, FILE_APPEND | LOCK_EX);
     }
