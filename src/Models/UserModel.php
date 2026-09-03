@@ -223,6 +223,10 @@ class UserModel implements \JsonSerializable
             if (!$isGmail) {
                 if ($originalEmail !== $cleanedEmail) {
                     $this->email = $cleanedEmail;
+                    if ($this->cleanser->email->wasTldCorrected()) {
+                        $this->setTags(self::EMAIL_CLEANED);
+                        $this->removeTags(self::EMAIL_REJECTED);
+                    }
                 } else {
                     $this->email = $originalEmail;
                 }

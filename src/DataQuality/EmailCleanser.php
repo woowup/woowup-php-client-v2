@@ -3,6 +3,7 @@
 namespace WoowUpV2\DataQuality;
 
 use WoowUpV2\DataQuality\Formatters\EmailFormatter;
+use WoowUpV2\DataQuality\Tld\TldCorrector;
 use WoowUpV2\DataQuality\Validators\GenericEmailValidator;
 use WoowUpV2\DataQuality\Validators\LengthValidator;
 use WoowUpV2\DataQuality\Validators\RepeatedValidator;
@@ -46,8 +47,10 @@ class EmailCleanser
     private $validators;
     private $emailUser;
     private $emailDomain;
+    private ?TldCorrector $tldCorrector;
+    private bool $tldWasCorrected = false;
 
-    public function __construct()
+    public function __construct(?TldCorrector $tldCorrector = null)
     {
         $this->formatter = new EmailFormatter();
         $this->validators = [
@@ -56,8 +59,14 @@ class EmailCleanser
             new SequenceValidator(7, 6, false),
             new GenericEmailValidator(),
         ];
-        $this->emailDomain = null;
-        $this->emailUser   = null;
+        $this->emailDomain    = null;
+        $this->emailUser      = null;
+        $this->tldCorrector   = $tldCorrector;
+    }
+
+    public function wasTldCorrected(): bool
+    {
+        return $this->tldWasCorrected;
     }
 
     /**
@@ -65,6 +74,8 @@ class EmailCleanser
      */
     public function sanitize($email)
     {
+        $this->tldWasCorrected = false;
+
         if (!$this->isValidInput($email)) {
             return false;
         }
@@ -88,8 +99,26 @@ class EmailCleanser
             return false;
         }
 
-        return $this->isGmailDomain()
-            ? $this->sanitizeGmailEmail()
+        if ($this->tldCorrector !== null && !$this->isGmailDomain()) {
+            $result = $this->tldCorrector->correct($this->emailDomain);
+            if ($result->isIrrecoverable) {
+                return false;
+            }
+            if ($result->wasCorrected) {
+                $this->emailDomain    = $result->correctedDomain;
+                $this->tldWasCorrected = true;
+            }
+        }
+
+        if ($this->isGmailDomain()) {
+            return $this->sanitizeGmailEmail();
+        }
+
+        // Pre-TLD-correction behavior returned the raw input; kept as-is when the
+        // feature is off so disabling FEATURE_TLD_CORRECTION restores byte-identical
+        // legacy output, not just "no TLD correction applied".
+        return $this->tldCorrector !== null
+            ? $this->prettify($this->emailUser . $this->emailDomain)
             : $this->prettify($email);
     }
 
@@ -306,16 +335,34 @@ class EmailCleanser
 
     /**
      * Checks if the domain part contains mixed domains (Gmail + another provider).
+     *
+     * With TLD correction enabled, a known domain only counts if found outside the
+     * matched Gmail-variant substring — otherwise a plain Gmail typo like "gmaol.com"
+     * would false-positive on "aol" (a substring of "gmaol") and get rejected instead
+     * of corrected to "@gmail.com". Kept behind the flag so disabling
+     * FEATURE_TLD_CORRECTION restores the exact legacy detection.
      */
     private function hasMixedDomains(string $domainPart): bool
     {
-        $hasGmail = $this->containsGmailDomain($domainPart);
-
-        if (!$hasGmail) {
-            return false;
+        if ($this->tldCorrector === null) {
+            return $this->containsGmailDomain($domainPart) && $this->containsOtherKnownDomain($domainPart);
         }
 
-        return $this->containsOtherKnownDomain($domainPart);
+        $dp = mb_strtolower($domainPart);
+
+        foreach (self::GMAIL_DOMAINS as $gmailDomain) {
+            $pos = strpos($dp, $gmailDomain);
+            if ($pos === false) {
+                continue;
+            }
+
+            $rest = substr($dp, 0, $pos) . substr($dp, $pos + strlen($gmailDomain));
+            if ($this->containsOtherKnownDomain($rest)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function containsGmailDomain(string $domainPart): bool
@@ -387,6 +434,29 @@ class EmailCleanser
         }
 
         $this->emailUser = substr($email, 0, $atPos);
-        $this->emailDomain = substr($email, $atPos);
+
+        // Legacy behavior: no domain normalization, kept so disabling
+        // FEATURE_TLD_CORRECTION restores the exact pre-TLD-correction extraction.
+        if ($this->tldCorrector === null) {
+            $this->emailDomain = substr($email, $atPos);
+            return;
+        }
+
+        // Lowercased so provider detection (single/multi-region) and TLD
+        // comparisons are case-insensitive — otherwise "YAHOO.CON" never
+        // matches "yahoo" or gets its edit distance to "com" computed right.
+        $domain = mb_strtolower(substr($email, $atPos));
+        // Comma or whitespace standing in for the dot separator (e.g.
+        // "gmail,com", "copaair, com") is never valid inside a real domain,
+        // unlike a hyphen — which legitimately appears in real domains
+        // ("mi-empresa.com.ar") and is deliberately left untouched here, since
+        // blindly dotting it could turn one real domain into a different one.
+        $domain = preg_replace('/[,\s]+/', '.', $domain);
+        // Consecutive dots (e.g. "hotmail..con") are collapsed to one, and a
+        // trailing dot (e.g. "hotmail.com.") is trimmed — otherwise either
+        // leaves an empty label, and a trailing one leaves an empty TLD after
+        // splitting at the last dot, making the address irrecoverable.
+        $domain = preg_replace('/\.{2,}/', '.', $domain);
+        $this->emailDomain = rtrim($domain, '.');
     }
 }
