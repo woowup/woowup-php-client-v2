@@ -38,7 +38,7 @@ class EmailCleanser
     ];
 
     const KNOWN_DOMAINS = [
-        'hotmail', 'hot', 'outlook', 'yahoo', 'live', 'msn', 'aol',
+        'hotmail', 'hot', 'outlook', 'yahoo', 'live', 'msn',
         'icloud', 'mac', 'protonmail', 'proton', 'zoho',
     ];
 
