@@ -48,6 +48,28 @@ class Branches extends Endpoint
         return false;
     }
 
+    /**
+     * Resolves a branch by name the same way the API does when a purchase carries `branch_name`,
+     * so the id returned is the one that purchase writes and deletes act on. The API answers 200
+     * with an empty payload when the branch does not exist.
+     *
+     * @return \WoowUpV2\Models\BranchModel|false
+     */
+    public function findByName($branchName)
+    {
+        $response = $this->get($this->host . '/branches/' . $this->encode($branchName), []);
+
+        if ($response->getStatusCode() == Endpoint::HTTP_OK) {
+            $data = json_decode($response->getBody());
+
+            if (!empty($data->payload->id)) {
+                return \WoowUpV2\Models\BranchModel::createFromJson(json_encode($data->payload));
+            }
+        }
+
+        return false;
+    }
+
     public function search($page = 0, $limit = 10)
     {
         $response = $this->get($this->host . '/branches/', [
