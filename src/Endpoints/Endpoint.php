@@ -163,6 +163,22 @@ class Endpoint
         ]);
     }
 
+    /**
+     * DELETE for endpoints that identify the resource in the body instead of the URL. Kept apart
+     * from delete() because Blacklist overrides delete($type) with a single argument, and widening
+     * the parent signature breaks that override.
+     */
+    protected function deleteJson($url, $data)
+    {
+        return $this->request('DELETE', $url, [
+            'json'    => $data,
+            'headers' => [
+                'Authorization' => 'Basic ' . $this->apikey,
+                'Accept'        => 'application/json',
+            ],
+        ]);
+    }
+
     protected function requestAsync($verb, $url, $params)
     {
         $attempts = 0;
