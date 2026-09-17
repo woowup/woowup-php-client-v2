@@ -184,7 +184,7 @@ class UserModel implements \JsonSerializable
      * Set email
      * @param string $email [description]
      */
-    public function setEmail(string $email, $sanitize = false, bool $disableIdNoemail = false)
+    public function setEmail(string $email, $sanitize = true, bool $disableIdNoemail = false)
     {
         if ($email === '') {
             trigger_error("Invalid email", E_USER_WARNING);

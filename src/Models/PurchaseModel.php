@@ -194,7 +194,7 @@ class PurchaseModel implements \JsonSerializable
      *
      * @return self
      */
-    public function setEmail(string $email, $sanitize = false, bool $disableIdNoemail = false)
+    public function setEmail(string $email, $sanitize = true, bool $disableIdNoemail = false)
     {
         if ($email === '') {
             trigger_error("Invalid email", E_USER_WARNING);
