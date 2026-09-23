@@ -31,10 +31,18 @@ class EmailCleanser
         'gmeil', 'gmeel', 'gmel',
         'gmaill', 'gmil', 'ggmail', 'gmmail', 'gmailm',
         'gemail', 'gaiml', 'gail', 'gmailcom', 'gmailcomcom',
+        'gamail', 'gimail', 'gmasil', 'gmnail', 'gamial', 'gmauil', 'gomail', 'gmsil',
+        'gtmail', 'gmaqil', 'gmaail', 'gmiail', 'gmsail', 'gimai', 'gmaoil', 'gnmail',
+        'gmayl', 'gmisl', 'gamaoil', 'gimeil', 'gma8il', 'gamcil', 'giimail', 'gimil',
+        'gmaeil', 'gamlil', 'gfmail', 'gmia',
+        // The only variants with an embedded dot: users who typed an extra "." inside
+        // "gmail" (e.g. "g.mail.com"). Matched with strpos(), not a regex, so the dot
+        // is literal and needs no escaping.
+        'g.mail', 'gm.ail',
     ];
 
     const KNOWN_DOMAINS = [
-        'hotmail', 'hot', 'outlook', 'yahoo', 'live', 'msn', 'aol',
+        'hotmail', 'hot', 'outlook', 'yahoo', 'live', 'msn',
         'icloud', 'mac', 'protonmail', 'proton', 'zoho',
     ];
 
