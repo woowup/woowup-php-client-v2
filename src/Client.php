@@ -4,6 +4,7 @@ namespace WoowUpV2;
 use WoowUpV2\Endpoints\AbandonedCarts;
 use WoowUpV2\Endpoints\Blacklist;
 use WoowUpV2\Endpoints\Branches;
+use WoowUpV2\Endpoints\Categories;
 use WoowUpV2\Endpoints\CustomAttributes;
 use WoowUpV2\Endpoints\Events;
 use WoowUpV2\Endpoints\Products;
@@ -63,6 +64,12 @@ class Client
     public $branches;
 
     /**
+     * Categories endpoint wrapper
+     * @var WoowUpV2\Endpoints\Categories
+     */
+    public $categories;
+
+    /**
      * CustomAttributes endpoint wrapper
      * @var WoowUpV2\Endpoints\CustomAttributes
      */
@@ -114,6 +121,7 @@ class Client
         $this->events           = new Events($url, $apikey, $http);
         $this->userEvents       = new UserEvents($url, $apikey, $http);
         $this->branches         = new Branches($url, $apikey, $http);
+        $this->categories       = new Categories($url, $apikey, $http);
         $this->account          = new Account($url, $apikey, $http, $appId);
         $this->blacklist        = new Blacklist($url, $apikey, $http);
         $this->stats            = new Stats($url, $apikey, $http);
