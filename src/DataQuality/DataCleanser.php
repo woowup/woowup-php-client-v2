@@ -35,6 +35,16 @@ class DataCleanser
         self::$globalTldCorrector = $corrector;
     }
 
+    /**
+     * Lets a caller outside the DataCleanser/EmailCleanser chain build its own EmailCleanser with
+     * whatever corrector is configured right now, instead of a full DataCleanser just to reach
+     * ->email, or a cached instance that keeps an old corrector after the next account clears it.
+     */
+    public static function getGlobalTldCorrector(): ?TldCorrector
+    {
+        return self::$globalTldCorrector;
+    }
+
     public function setTldCorrector(TldCorrector $corrector): void
     {
         $this->email = new EmailCleanser($corrector);
