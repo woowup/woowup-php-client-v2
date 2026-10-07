@@ -7,6 +7,7 @@ use WoowUpV2\DataQuality\Tld\TldCorrector;
 use WoowUpV2\DataQuality\NamesCleanser as NamesCleanser;
 use WoowUpV2\DataQuality\TelephoneCleanser as TelephoneCleanser;
 use WoowUpV2\DataQuality\StreetCleanser as StreetCleanser;
+use WoowUpV2\DataQuality\PostcodeCleanser as PostcodeCleanser;
 use WoowUpV2\DataQuality\GenderCleanser as GenderCleanser;
 use WoowUpV2\DataQuality\BirthdateCleanser as BirthdateCleanser;
 use WoowUpV2\DataQuality\CustomAttributeCleanser as CustomAttributeCleanser;
@@ -17,6 +18,7 @@ class DataCleanser
     public $names;
     public $telephone;
     public $street;
+    public $postcode;
     public $gender;
     public $birthdate;
     public $customAttributes;
@@ -56,6 +58,7 @@ class DataCleanser
         $this->names            = new NamesCleanser();
         $this->telephone        = new TelephoneCleanser();
         $this->street           = new StreetCleanser();
+        $this->postcode         = new PostcodeCleanser();
         $this->gender           = new GenderCleanser();
         $this->birthdate        = new BirthdateCleanser();
         $this->customAttributes = new CustomAttributeCleanser();

@@ -490,14 +490,14 @@ class UserModel implements \JsonSerializable
     }
 
     /**
-     * Set postcode
+     * Set postcode, truncated to the 16 characters the API accepts
      * @param mixed $postcode
      *
      * @return self
      */
     public function setPostcode(string $postcode)
     {
-        $this->postcode = $postcode;
+        $this->postcode = $this->cleanser->postcode->truncate($postcode);
 
         return $this;
     }
