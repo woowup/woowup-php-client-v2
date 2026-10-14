@@ -93,6 +93,13 @@ $c = customerWithEmail('30111222@noemail.com');
 check($c->getEmail() === '30111222@noemail.com' && $c->getEmailStatus() === 'generic', 'un @noemail.com que viene de la fuente es generic');
 $c = customerWithEmail('JUAN.123@mail.mercadolibre.com');
 check($c->getEmail() === 'juan.123@mail.mercadolibre.com' && $c->getEmailStatus() === 'generic', 'una direccion proxy de mercadolibre es generic');
+$c = (new PurchaseCustomerModel())->setDocument('30111222')->setEmail('nada', true);
+check($c->getEmail() === '30111222@noemail.com', 'setEmail($x, true) sanitiza y no apaga el <id>@noemail.com, igual que PurchaseModel');
+$c = (new PurchaseCustomerModel())->setDocument('30111222')->setEmail('nada', true, true);
+check($c->getEmail() === 'noemail@noemail.com', 'el tercer parametro apaga el <id>@noemail.com, igual que PurchaseModel');
+$c = (new PurchaseCustomerModel())->setDocument('30111222')->setEmail('nada')->setEmail('Ana@Hotmail.com', false);
+check($c->getEmail() === 'Ana@Hotmail.com' && $c->getEmailStatus() === null, 'sin sanitizar queda tal cual y sin email_status');
+check($c->getRaw()['email'] === 'Ana@Hotmail.com', 'sin sanitizar el valor igual queda en raw');
 $c = customerWithEmail(str_repeat('a', 140) . ' sin arroba');
 check(strlen($c->getRaw()['email']) === 128, 'raw.email se corta a los 128 que acepta la API');
 
@@ -105,6 +112,11 @@ $c = (new PurchaseCustomerModel())->setDocument('30111222')->setTelephone('11111
 check($c->getTelephone() === null && $c->getTelephoneStatus() === 'rejected', 'un telefono descartado es rejected y no va en customer');
 check(!isset(json_decode(json_encode($c), true)['telephone']), 'el telefono rechazado no se serializa');
 check($c->getRaw()['telephone'] === '1111111111', 'el telefono rechazado queda en raw');
+$c = (new PurchaseCustomerModel())->setTelephone('+57 301 152 8226', true);
+check($c->getTelephone() === '+573011528226' && $c->getTelephoneStatus() === 'cleaned', 'setTelephone($x, true) sanitiza, igual que PurchaseModel');
+$c = (new PurchaseCustomerModel())->setTelephone('1111111111')->setTelephone('+57 301 152 8226', false);
+check($c->getTelephone() === '+57 301 152 8226' && $c->getTelephoneStatus() === null, 'setTelephone($x, false) queda tal cual y sin telephone_status');
+check($c->getRaw()['telephone'] === '+57 301 152 8226', 'sin sanitizar el telefono igual queda en raw');
 $c = (new PurchaseCustomerModel())->setDocument('30111222')->setTelephone('11+22');
 check($c->getTelephoneStatus() === 'rejected', 'un telefono con operadores que rechaza la API es rejected');
 

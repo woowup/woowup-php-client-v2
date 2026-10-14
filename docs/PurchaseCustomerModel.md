@@ -6,8 +6,8 @@ Represents the customer of a purchase sent to `POST /purchases/with-customer` an
 | --- | --- | --- | --- |
 | document | setDocument(*string* $document) | getDocument() | Also stored in `raw.document` |
 | service_uid | setServiceUid(*string* $service_uid) | getServiceUid() | Also stored in `raw.service_uid` |
-| telephone | setTelephone(*string* $telephone) | getTelephone() | Sets `raw.telephone` and `raw.telephone_status` |
-| email | setEmail(*string* $email, *bool* $disableIdNoemail = false) | getEmail() | Sets `raw.email` and `raw.email_status` |
+| telephone | setTelephone(*string* $telephone, *bool* $sanitize = true) | getTelephone() | Same signature as PurchaseModel/UserModel, but sanitizes by default. Sets `raw.telephone` and, when sanitizing, `raw.telephone_status` |
+| email | setEmail(*string* $email, *bool* $sanitize = true, *bool* $disableIdNoemail = false) | getEmail() | Same signature as PurchaseModel/UserModel. Sets `raw.email` and, when sanitizing, `raw.email_status` |
 | raw | | getRaw(), getEmailStatus(), getTelephoneStatus() | |
 
 ## Statuses

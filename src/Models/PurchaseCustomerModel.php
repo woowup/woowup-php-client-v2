@@ -118,12 +118,16 @@ class PurchaseCustomerModel implements \JsonSerializable
      * when the cleanser changes anything, even case or spaces; validated when it stays the same;
      * rejected when it has no valid format, in which case <id>@noemail.com takes its place.
      *
+     * Same signature as PurchaseModel::setEmail() and UserModel::setEmail(). Without sanitizing the
+     * email is kept as given and gets no email_status, since the cleanser did nothing with it.
+     *
      * @param string $email
+     * @param bool   $sanitize
      * @param bool   $disableIdNoemail Use noemail@noemail.com instead of <id>@noemail.com
      *
      * @return self
      */
-    public function setEmail(string $email, bool $disableIdNoemail = false)
+    public function setEmail(string $email, $sanitize = true, bool $disableIdNoemail = false)
     {
         if (trim($email) === '') {
             trigger_error("Invalid email", E_USER_WARNING);
@@ -131,6 +135,13 @@ class PurchaseCustomerModel implements \JsonSerializable
         }
 
         $this->setRaw('email', $this->truncate($email, self::EMAIL_MAX_LENGTH));
+
+        if (!$sanitize) {
+            $this->email = $email;
+            $this->setRaw('email_status', null);
+
+            return $this;
+        }
 
         if ($this->isGenericEmail($email)) {
             $this->email = $this->cleanser->email->prettify($email);
@@ -176,17 +187,29 @@ class PurchaseCustomerModel implements \JsonSerializable
      * A telephone the cleanser drops is marked rejected and left out of the customer; the seller's
      * value stays in raw.
      *
+     * Same signature as PurchaseModel::setTelephone() and UserModel::setTelephone(), but sanitizing
+     * by default so the status is always recorded. Without sanitizing the telephone is kept as given
+     * and gets no telephone_status, since the cleanser did nothing with it.
+     *
      * @param string|int $telephone
+     * @param bool       $sanitize
      *
      * @return self
      */
-    public function setTelephone($telephone)
+    public function setTelephone($telephone, $sanitize = true)
     {
         if (trim((string) $telephone) === '') {
             return $this;
         }
 
         $this->setRaw('telephone', $this->truncate((string) $telephone, self::TELEPHONE_MAX_LENGTH));
+
+        if (!$sanitize) {
+            $this->telephone = (string) $telephone;
+            $this->setRaw('telephone_status', null);
+
+            return $this;
+        }
 
         $cleanedTelephone = $this->cleanser->telephone->sanitize($telephone);
 
