@@ -20,7 +20,8 @@ In order to avoid common mistakes (e.g. orders uploaded without a `branch_name` 
 [PurchaseItemModel documentation](docs/PurchaseItemModel.md)<br>
 [PurchasePricesModel documentation](docs/PurchasePricesModel.md)<br>
 [PurchasePaymentModel documentation](docs/PurchasePaymentModel.md)<br>
-[SellerModel documentation](docs/SellerModel.md)
+[SellerModel documentation](docs/SellerModel.md)<br>
+[PurchaseCustomerModel documentation](docs/PurchaseCustomerModel.md)
 
 ## Validation
 

@@ -5,6 +5,7 @@ Before checking this model out, it is recommended to take a look at the followin
 + [PurchasePricesModel documentation](PurchasePricesModel.md)
 + [PurchasePaymentModel documentation](PurchasePaymentModel.md)
 + [SellerModel documentation](SellerModel.md) (optional)
++ [PurchaseCustomerModel documentation](PurchaseCustomerModel.md) (optional, only for the with-customer endpoints)
 
 ## List of methods
 
@@ -23,6 +24,7 @@ Before checking this model out, it is recommended to take a look at the followin
 | payment | addPayment(*\WoowUpV2\Models\PurchasePaymentModel* $payment) | | Adds a payment of type PurchasePaymentModel |
 | branch_name | setBranchName(*string* branch_name) | getBranchName() | |
 | seller | setSeller(*\WoowUpV2\Models\SellerModel* $seller) | getSeller() | See SellerModel.md |
+| customer | setCustomer(*\WoowUpV2\Models\PurchaseCustomerModel* $customer) | getCustomer() | Only for the with-customer endpoints, which ignore the identifiers in the root. See PurchaseCustomerModel.md |
 | createtime | setCreatetime(*string* $createtime) | getCreatetime() | Format: YYYY-MM-DD HH:ii:ss |
 | approvedtime | setApprovedTime(*string* $approvedtime) | getApprovedTime() | Format: YYYY-MM-DD HH:ii:ss |
 | metadata | setMetadata($metadata) | getMetadata() | |
