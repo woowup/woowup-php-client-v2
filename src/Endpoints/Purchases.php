@@ -43,6 +43,46 @@ class Purchases extends Endpoint
         throw new \Exception("Purchase is not valid", 1);
     }
 
+    /**
+     * Saves the customer and queues the sale. A 200 confirms the customer, not the sale: if the
+     * sale fails later in the queue it is reported through the account's failed-purchase webhook.
+     * Errors (bad_request, error_branch_name, duplicated_purchase_number, customer_not_saved)
+     * surface as a RequestException, same as create().
+     *
+     * @return \stdClass payload with userapp_id and customer_created
+     */
+    public function createWithCustomer(\WoowUpV2\Models\PurchaseModel $purchase)
+    {
+        $purchase->validateWithCustomer();
+
+        $response = $this->post($this->host . '/purchases/with-customer', $purchase);
+
+        return json_decode($response->getBody())->payload;
+    }
+
+    /**
+     * Each sale is validated and saved on its own. A partial save answers 207 and does not throw:
+     * the sales that did not go in come in `errors`, by invoice_number with their code, and only
+     * those should be resent. When none goes in the API answers 400, which surfaces as a
+     * RequestException with the same `errors` in its body.
+     *
+     * @param \WoowUpV2\Models\PurchaseModel[] $purchases
+     * @return \stdClass payload with `customers` and, on a partial save, `errors`
+     */
+    public function bulkCreateWithCustomer($purchases)
+    {
+        foreach ($purchases as $key => $purchase) {
+            if (!is_a($purchase, "\WoowUpV2\Models\PurchaseModel")) {
+                throw new \Exception("Purchase at key $key is not valid", 1);
+            }
+            $purchase->validateWithCustomer();
+        }
+
+        $response = $this->post($this->host . '/purchases/bulk/with-customer', array_values($purchases));
+
+        return json_decode($response->getBody())->payload;
+    }
+
     public function update(\WoowUpV2\Models\PurchaseModel $purchase)
     {
         if ($purchase->validate()) {

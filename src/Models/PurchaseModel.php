@@ -7,6 +7,7 @@ use WoowUpV2\Models\PurchaseItemModel as Item;
 use WoowUpV2\Models\PurchasePricesModel as Prices;
 use WoowUpV2\Models\PurchasePaymentModel as Payment;
 use WoowUpV2\Models\SellerModel as Seller;
+use WoowUpV2\Models\PurchaseCustomerModel as Customer;
 
 class PurchaseModel implements \JsonSerializable
 {
@@ -31,6 +32,7 @@ class PurchaseModel implements \JsonSerializable
     private $payment;
     private $branch_name;
     private $seller;
+    private $customer;
     private $createtime;
     private $approvedtime;
     private $metadata;
@@ -47,6 +49,46 @@ class PurchaseModel implements \JsonSerializable
     }
 
     public function validate()
+    {
+        $this->validateSale();
+
+        if (isset($this->service_uid) && !empty($this->service_uid)) {
+            return true;
+        }
+
+        if (isset($this->document) && !empty($this->document)) {
+            return true;
+        }
+
+        if (isset($this->email) && !empty($this->email)) {
+            return true;
+        }
+
+        if (isset($this->telephone) && !empty($this->telephone)) {
+            return true;
+        }
+
+        throw new \Exception("Invalid purchase " . $this->invoice_number . ": at least service_uid, document, telephone or email must be specified", 1);
+        return false;
+    }
+
+    /**
+     * Validation for POST /purchases/with-customer: the API ignores the identifiers in the root and
+     * takes the customer's from `customer`, so the root ones are not required here.
+     */
+    public function validateWithCustomer()
+    {
+        $this->validateSale();
+
+        if (!isset($this->customer) || !$this->customer->validate()) {
+            throw new \Exception("Invalid purchase " . $this->invoice_number . ": a customer with at least service_uid, document, telephone or email must be specified", 1);
+            return false;
+        }
+
+        return true;
+    }
+
+    private function validateSale()
     {
         if (!isset($this->invoice_number) || empty($this->invoice_number)) {
             throw new \Exception("Invalid purchase: invalid invoice_number", 1);
@@ -84,24 +126,7 @@ class PurchaseModel implements \JsonSerializable
             return false;
         }
 
-        if (isset($this->service_uid) && !empty($this->service_uid)) {
-            return true;
-        }
-
-        if (isset($this->document) && !empty($this->document)) {
-            return true;
-        }
-
-        if (isset($this->email) && !empty($this->email)) {
-            return true;
-        }
-
-        if (isset($this->telephone) && !empty($this->telephone)) {
-            return true;
-        }
-
-        throw new \Exception("Invalid purchase " . $this->invoice_number . ": at least service_uid, document, telephone or email must be specified", 1);
-        return false;
+        return true;
     }
 
     public function addItem(Item $item)
@@ -453,6 +478,33 @@ class PurchaseModel implements \JsonSerializable
             $this->seller = $seller;
         } else {
             trigger_error("Invalid seller", E_USER_WARNING);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return PurchaseCustomerModel|null
+     */
+    public function getCustomer()
+    {
+        return $this->customer;
+    }
+
+    /**
+     * Customer for POST /purchases/with-customer. The plain /purchases endpoints keep reading the
+     * identifiers from the root.
+     *
+     * @param PurchaseCustomerModel $customer
+     *
+     * @return self
+     */
+    public function setCustomer(Customer $customer)
+    {
+        if ($customer->validate()) {
+            $this->customer = $customer;
+        } else {
+            trigger_error("Invalid customer", E_USER_WARNING);
         }
 
         return $this;
