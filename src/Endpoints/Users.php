@@ -72,10 +72,10 @@ class Users extends Endpoint
 
     /**
      * Keys of the account's multidentificator_settings, read with GET /account the first time it
-     * is needed. A failed read (exception, non-200, payload without the settings) is memoized as
-     * null for the life of the instance: the request already goes through Endpoint's retries for
-     * 429/502/503, and retrying on every update would add a GET to each PUT of a whole run while
-     * /account is failing. Without the settings nothing is dropped, so the PUT behaves as before.
+     * is needed. A failed read (exception, non-200, payload without the settings or with them
+     * empty) is memoized as null for the life of the instance: the request already goes through
+     * Endpoint's retries for 429/502/503, and retrying on every update would add a GET to each PUT
+     * of a whole run while /account is failing. Without the settings nothing is dropped, so the PUT behaves as before.
      *
      * @return array|null
      */

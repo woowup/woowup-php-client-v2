@@ -29,7 +29,11 @@ class Account extends Endpoint
      * identifier, e.g. ['document' => ['type' => 'hard'], 'email' => ['type' => 'soft']]. Disabled
      * identifiers are not part of the object, so a key being present means it is enabled.
      *
-     * @return array|null null when the response is not a 200 or does not carry the settings
+     * An empty object is treated as unreadable too: an account always has at least one identifier,
+     * so an empty value says nothing about service_uid and must not lead to dropping it.
+     *
+     * @return array|null null when the response is not a 200 or the settings are missing, not an
+     *                    array or empty
      */
     public function multidentificatorSettings()
     {
@@ -42,7 +46,7 @@ class Account extends Endpoint
         $data     = json_decode((string) $response->getBody(), true);
         $settings = isset($data['payload']['multidentificator_settings']) ? $data['payload']['multidentificator_settings'] : null;
 
-        return is_array($settings) ? $settings : null;
+        return is_array($settings) && !empty($settings) ? $settings : null;
     }
 
     public function getAppId()
