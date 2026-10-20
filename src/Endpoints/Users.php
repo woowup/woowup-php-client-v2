@@ -13,6 +13,14 @@ class Users extends Endpoint
         'telephone'   => ''
     ];
 
+    /**
+     * Identifiers enabled in the account's multi-id, read once per instance. false means not read
+     * yet; null means the read failed, and that is memoized too (see multiIdentifiers()).
+     *
+     * @var array|null|false
+     */
+    private $multiIdentifiers = false;
+
     public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http = null)
     {
         parent::__construct($host, $apikey, $http);
@@ -24,7 +32,7 @@ class Users extends Endpoint
             throw new \Exception("User is not valid", 1);
         }
 
-        $response = $this->put($this->host . '/multiusers', $user);
+        $response = $this->put($this->host . '/multiusers', $this->multiusersBody($user));
 
         return $response->getStatusCode() == Endpoint::HTTP_OK || $response->getStatusCode() == Endpoint::HTTP_CREATED;
     }
@@ -35,7 +43,58 @@ class Users extends Endpoint
             throw new \Exception("User is not valid", 1);
         }
 
-        return $this->putAsync($this->host . '/multiusers', $user);
+        return $this->putAsync($this->host . '/multiusers', $this->multiusersBody($user));
+    }
+
+    /**
+     * Body of PUT /multiusers. The API answers 400 "No identificator received, please check
+     * multi-id settings" when the body carries service_uid and the account does not have it in its
+     * multi-id, so in that case the key is dropped from the serialized payload. The model itself is
+     * not touched: callers keep using it after the update (cache hashes, identity, logs).
+     *
+     * Only service_uid is dropped. When the multi-id cannot be read, the body goes as before.
+     *
+     * @return \WoowUpV2\Models\UserModel|array
+     */
+    protected function multiusersBody(\WoowUpV2\Models\UserModel $user)
+    {
+        $identifiers = $this->multiIdentifiers();
+
+        if ($identifiers === null || in_array('service_uid', $identifiers, true)) {
+            return $user;
+        }
+
+        $body = $user->jsonSerialize();
+        unset($body['service_uid']);
+
+        return $body;
+    }
+
+    /**
+     * Keys of the account's multidentificator_settings, read with GET /account the first time it
+     * is needed. A failed read (exception, non-200, payload without the settings or with them
+     * empty) is memoized as null for the life of the instance: the request already goes through
+     * Endpoint's retries for 429/502/503, and retrying on every update would add a GET to each PUT
+     * of a whole run while /account is failing. Without the settings nothing is dropped, so the PUT behaves as before.
+     *
+     * @return array|null
+     */
+    protected function multiIdentifiers()
+    {
+        if ($this->multiIdentifiers !== false) {
+            return $this->multiIdentifiers;
+        }
+
+        try {
+            $settings = (new Account($this->host, $this->apikey, $this->http))->multidentificatorSettings();
+        } catch (\Throwable $e) {
+            error_log('[WARNING] [WoowupClient] Could not read the multi-id settings from GET /account: ' . $e->getMessage());
+            $settings = null;
+        }
+
+        $this->multiIdentifiers = is_array($settings) ? array_map('strval', array_keys($settings)) : null;
+
+        return $this->multiIdentifiers;
     }
 
     public function create(\WoowUpV2\Models\UserModel $user)
