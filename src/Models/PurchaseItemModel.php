@@ -186,6 +186,7 @@ class PurchaseItemModel extends WoowUpProduct
         return $this;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $array = parent::jsonSerialize();

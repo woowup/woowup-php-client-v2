@@ -43,6 +43,11 @@ class Client
      * Abandoned Cart endpoint wrapper
      * @var WoowUpV2\Endpoints\AbandonedCarts
      */
+    public $abandonedCarts;
+
+    /**
+     * @deprecated Misspelled and never set; use $abandonedCarts.
+     */
     public $abadonedCarts;
 
     /**

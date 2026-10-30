@@ -315,6 +315,7 @@ class FamilyMemberModel implements \JsonSerializable
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $array = [];

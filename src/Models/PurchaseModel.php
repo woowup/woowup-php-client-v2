@@ -303,7 +303,7 @@ class PurchaseModel implements \JsonSerializable
      */
     public function setTelephone($telephone, $sanitize = false)
     {
-        if (trim($telephone) === '') {
+        if (trim($telephone ?? '') === '') {
             return $this;
         }
 
@@ -627,6 +627,7 @@ class PurchaseModel implements \JsonSerializable
         return $count;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $array = [];

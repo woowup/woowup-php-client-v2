@@ -104,6 +104,9 @@ class UserModel implements \JsonSerializable
     // Countries
     private $countriesHelper;
 
+    // Declared last so jsonSerialize() keeps it after the other fields, as when it was dynamic.
+    private $genderize_apikey;
+
     /**
      * Constructor
      */
@@ -1112,6 +1115,7 @@ class UserModel implements \JsonSerializable
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $array = [];

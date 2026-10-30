@@ -447,6 +447,7 @@ class ProductModel implements \JsonSerializable
         return true;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $array = [];

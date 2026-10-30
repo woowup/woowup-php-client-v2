@@ -21,7 +21,7 @@ class Users extends Endpoint
      */
     private $multiIdentifiers = false;
 
-    public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http = null)
+    public function __construct($host, $apikey, ?\GuzzleHttp\ClientInterface $http = null)
     {
         parent::__construct($host, $apikey, $http);
     }

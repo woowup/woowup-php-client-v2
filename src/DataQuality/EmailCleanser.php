@@ -163,7 +163,7 @@ class EmailCleanser
      */
     public function prettify($email)
     {
-        return utf8_encode(mb_strtolower(trim($email)));
+        return mb_convert_encoding(mb_strtolower(trim($email ?? '')), 'UTF-8', 'ISO-8859-1');
     }
 
     /**

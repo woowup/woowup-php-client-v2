@@ -23,7 +23,7 @@ class NamesCleanser
             self::LAST_NAME_INDEX  => [],
         ];
 
-        $normalized = trim($fullname);
+        $normalized = trim($fullname ?? '');
 
         if (preg_match('/[.,;\/-]/', $normalized)) {
             $parts = preg_split('/[.,;\/-]+/', $normalized, -1, PREG_SPLIT_NO_EMPTY);
@@ -97,6 +97,6 @@ class NamesCleanser
 
     public function prettify($name)
     {
-        return ucwords(mb_strtolower(trim($name)));
+        return ucwords(mb_strtolower(trim($name ?? '')));
     }
 }

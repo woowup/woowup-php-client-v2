@@ -200,6 +200,7 @@ class CustomAttributeModel implements \JsonSerializable
         return false;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $array = [];

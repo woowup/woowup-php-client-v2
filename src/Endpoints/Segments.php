@@ -3,7 +3,7 @@ namespace WoowUpV2\Endpoints;
 
 class Segments extends Endpoint
 {
-    public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http = null)
+    public function __construct($host, $apikey, ?\GuzzleHttp\ClientInterface $http = null)
     {
         parent::__construct($host, $apikey, $http);
     }

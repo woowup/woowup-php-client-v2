@@ -54,7 +54,7 @@ function customerWithEmail($email, $document = null)
     return $customer->setEmail($email);
 }
 
-function purchase($invoiceNumber, PurchaseCustomerModel $customer = null)
+function purchase($invoiceNumber, ?PurchaseCustomerModel $customer = null)
 {
     $purchase = new PurchaseModel();
     $purchase->setInvoiceNumber($invoiceNumber)
