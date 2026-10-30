@@ -45,6 +45,11 @@ class UserModel implements \JsonSerializable
         'service_uid',
         'birthdate',
     ];
+    private const NOT_SERIALIZED_FIELDS = [
+        'cleanser',
+        'countriesHelper',
+        'genderize_apikey',
+    ];
     protected const TELEPHONE_CLEANED = 'telephone_cleaned';
     protected const TELEPHONE_REJECTED = 'telephone_rejected';
     protected const TELEPHONE_VALIDATED = 'telephone_validated';
@@ -104,7 +109,6 @@ class UserModel implements \JsonSerializable
     // Countries
     private $countriesHelper;
 
-    // Declared last so jsonSerialize() keeps it after the other fields, as when it was dynamic.
     private $genderize_apikey;
 
     /**
@@ -1120,7 +1124,10 @@ class UserModel implements \JsonSerializable
     {
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
-            if ((($value !== null) || in_array($property, self::CAN_BE_NULL_FIELDS)) && ($property !== 'cleanser') && ($property !== 'countriesHelper')) {
+            if (in_array($property, self::NOT_SERIALIZED_FIELDS, true)) {
+                continue;
+            }
+            if (($value !== null) || in_array($property, self::CAN_BE_NULL_FIELDS)) {
                 $array[$property] = $value;
             }
         }
