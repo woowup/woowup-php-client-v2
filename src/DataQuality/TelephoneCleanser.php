@@ -78,13 +78,20 @@ class TelephoneCleanser
 			return false;
 		}
 
-		foreach ($this->validators as $validator) {
-			if (!$validator->validate($cleanedTelephone)) {
-				return false;
-			}
+		if (!$this->passesValidators($cleanedTelephone)) {
+			return false;
 		}
 
 		return $cleanedTelephone;
+	}
+
+	/**
+	 * Runs the validators on the digits as given, without the formatting of sanitize(), which adds
+	 * "+" before a leading country code and so makes the sequence check skip the number.
+	 */
+	public function isPlausible(string $digits): bool
+	{
+		return ctype_digit($digits) && $this->passesValidators($digits);
 	}
 
     /**
@@ -136,5 +143,16 @@ class TelephoneCleanser
 		}
 
 		return false;
+	}
+
+	private function passesValidators(string $telephone): bool
+	{
+		foreach ($this->validators as $validator) {
+			if (!$validator->validate($telephone)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
