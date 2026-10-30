@@ -40,7 +40,7 @@ class Endpoint
     public static function getThrottleCounts(): array { return self::$throttleCounts; }
     public static function resetThrottleCount(): void  { self::$throttleCounts = []; }
 
-    public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http = null)
+    public function __construct($host, $apikey, ?\GuzzleHttp\ClientInterface $http = null)
     {
         $this->host   = $host;
         $this->apikey = $apikey;

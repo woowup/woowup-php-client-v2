@@ -69,6 +69,7 @@ class EventModel implements \JsonSerializable
         return $this->createtime;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
     	$array = [];

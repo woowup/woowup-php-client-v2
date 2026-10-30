@@ -2,7 +2,7 @@
     "name": "woowup/woowup-php-client-v2",
     "minimum-stability": "dev",
     "require": {
-        "guzzlehttp/guzzle": "^6.3",
+        "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "kcassam/mailcheck": "dev-master"
     },
     "authors": [

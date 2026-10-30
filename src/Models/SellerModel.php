@@ -110,6 +110,7 @@ class SellerModel implements \JsonSerializable
         return $this;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $array = [];

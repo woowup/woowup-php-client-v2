@@ -40,7 +40,7 @@ class Genderizer {
 
     protected function extractFirstName($name)
     {
-        return preg_replace("/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/u", "", strtok($name, ' '));
+        return preg_replace("/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/u", "", strtok($name ?? '', ' '));
     }
 
     /**
@@ -87,7 +87,10 @@ class Genderizer {
         $response = curl_exec($curl);
         $error    = curl_error($curl);
 
-        curl_close($curl);
+        // No-op since PHP 8.0 and deprecated in 8.5.
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($curl);
+        }
 
         if (!empty($error) || (!empty($response) && isset(json_decode($response)->error))) {
             $error = !empty($error) ? $error : json_decode($response)->error;

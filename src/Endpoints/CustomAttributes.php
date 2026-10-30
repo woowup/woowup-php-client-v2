@@ -10,7 +10,7 @@ class CustomAttributes extends Endpoint
 		'products'		=> 'product-custom-attributes',
 	];
 
-    public function __construct($host, $apikey, \GuzzleHttp\ClientInterface $http = null)
+    public function __construct($host, $apikey, ?\GuzzleHttp\ClientInterface $http = null)
     {
         parent::__construct($host, $apikey, $http);
     }
@@ -31,7 +31,7 @@ class CustomAttributes extends Endpoint
         return false;
     }
 
-    public function updateAttributeDefinition($data, $entity, string $oldName = null)
+    public function updateAttributeDefinition($data, $entity, ?string $oldName = null)
     {
         $name = $oldName ?? $data->name;
     	$response = $this->put($this->host . '/account/' . self::ENTITIES[$entity] . '/' . $name, $data);

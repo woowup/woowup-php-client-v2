@@ -244,6 +244,7 @@ class PurchaseCustomerModel implements \JsonSerializable
         return $this->raw['telephone_status'] ?? null;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $array = [];

@@ -31,7 +31,7 @@ class CountriesHelper
 
 	public function ISO2ToISO3($code)
 	{
-		$code = strtoupper($code);
+		$code = strtoupper($code ?? '');
 		foreach ($this->countries as $country) {
 			if ($country->{'ISO-2'} === $code) {
 				return $country->{'ISO-3'};
@@ -45,7 +45,7 @@ class CountriesHelper
 	{
 		$accents = '/&([A-Za-z]{1,2})(grave|acute|circ|cedil|uml|lig);/';
 
-		$string_encoded = htmlentities($string,ENT_NOQUOTES,'UTF-8');
+		$string_encoded = htmlentities($string ?? '',ENT_NOQUOTES,'UTF-8');
 
 		return preg_replace($accents,'$1',$string_encoded);
 	}
