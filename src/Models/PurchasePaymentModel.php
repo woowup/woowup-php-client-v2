@@ -163,7 +163,7 @@ class PurchasePaymentModel implements \JsonSerializable
         return $array;
     }
 
-    public function createFromJson($json)
+    public static function createFromJson($json)
     {
         $payment = new self();
 
