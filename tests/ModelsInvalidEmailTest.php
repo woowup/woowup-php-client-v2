@@ -10,6 +10,8 @@
  *   null, el resto no setea el email). Si el que llama pasa el placeholder a propósito (vendedor default
  *   de Odoo/SiesaSelene en connectors), se sigue guardando.
  *
+ * También cubre los helpers que usan: EmailCleanser::sanitizeStrict() y EmailCleanser::noemailFor().
+ *
  * Ejecutar: php tests/ModelsInvalidEmailTest.php
  */
 
@@ -24,6 +26,7 @@ spl_autoload_register(function ($class) {
     }
 });
 
+use WoowUpV2\DataQuality\EmailCleanser;
 use WoowUpV2\Models\AbandonedCartModel;
 use WoowUpV2\Models\BranchModel;
 use WoowUpV2\Models\FamilyMemberModel;
@@ -95,6 +98,29 @@ foreach ($modelos as $nombre => $nuevo) {
 
     $email_guardado = prop($nuevo()->setEmail('Mail@Empresa.com.ar'), 'email');
     check($email_guardado === 'mail@empresa.com.ar', "$nombre mail@ en dominio propio -> " . var_export($email_guardado, true));
+}
+
+echo "\n--- EmailCleanser::noemailFor y sanitizeStrict ---\n";
+
+$casos = [
+    [['30123456', 'X1', '1155556666'], '30123456@noemail.com'],
+    [[null, 'X1', '1155556666'], 'X1@noemail.com'],
+    [[null, null, '1155556666'], '1155556666@noemail.com'],
+    [[null, null, null], 'noemail@noemail.com'],
+    [[], 'noemail@noemail.com'],
+    // Igual que el ?? encadenado que reemplaza: el primer id no nulo decide, aunque esté vacío
+    [['', 'X1'], 'noemail@noemail.com'],
+];
+foreach ($casos as [$ids, $esperado]) {
+    $out = EmailCleanser::noemailFor(...$ids);
+    check($out === $esperado, 'noemailFor(' . implode(', ', array_map(function ($v) { return var_export($v, true); }, $ids)) . ") -> $out");
+}
+
+$c = new EmailCleanser();
+foreach (['no@mail.com' => false, 'ana@hotmail.com / juan@gmail.com' => false, 'NoEmail@NoEmail.com' => 'noemail@noemail.com',
+             'Ana@Hotmail.com' => 'ana@hotmail.com', 'sinarroba' => false] as $email => $esperado) {
+    $out = $c->sanitizeStrict($email);
+    check($out === $esperado, "sanitizeStrict($email) -> " . var_export($out, true));
 }
 
 echo "\n$passed OK, $failed FAIL\n";

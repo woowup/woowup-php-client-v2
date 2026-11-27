@@ -3,7 +3,6 @@
 namespace WoowUpV2\Models;
 
 use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
-use WoowUpV2\DataQuality\EmailCleanser;
 
 class FamilyMemberModel implements \JsonSerializable
 {
@@ -98,13 +97,7 @@ class FamilyMemberModel implements \JsonSerializable
         if ($email !== '') {
             if ($sanitize) {
                 $originalEmail = $email;
-                $email = $this->cleanser->email->sanitize($email);
-
-                // A filler user ("no@mail.com") comes back as INVALID_EMAIL, the placeholder every
-                // customer shares: rejected like false so it isn't saved under it. Passing the
-                // placeholder itself still keeps it.
-                if ($email === false || ($email === EmailCleanser::INVALID_EMAIL
-                        && mb_strtolower(trim($originalEmail)) !== EmailCleanser::INVALID_EMAIL)) {
+                if (($email = $this->cleanser->email->sanitizeStrict($email)) === false) {
                     trigger_error("Email sanitization of $originalEmail failed", E_USER_WARNING);
                     return $this;
                 }

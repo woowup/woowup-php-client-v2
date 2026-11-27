@@ -2,6 +2,7 @@
 
 namespace WoowUpV2\Models;
 
+use WoowUpV2\DataQuality\EmailCleanser;
 use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
 use WoowUpV2\Support\CountriesHelper as CountriesHelper;
 
@@ -207,14 +208,9 @@ class UserModel implements \JsonSerializable
                 $this->removeTags(self::EMAIL_CLEANED . ',' . self::EMAIL_VALIDATED);
 
                 if ($cleanedEmail === self::INVALID_EMAIL) {
-                    $localPart = $disableIdNoemail ? null : ($this->document
-                        ?? $this->service_uid
-                        ?? $this->telephone
-                        ?? null);
-
-                    $this->email = $localPart
-                        ? $localPart . '@noemail.com'
-                        : self::INVALID_EMAIL;
+                    $this->email = $disableIdNoemail
+                        ? self::INVALID_EMAIL
+                        : EmailCleanser::noemailFor($this->document ?? null, $this->service_uid ?? null, $this->telephone ?? null);
                 } else {
                     $this->email = $originalEmail;
                 }
@@ -277,17 +273,9 @@ class UserModel implements \JsonSerializable
                 $this->setTags(self::EMAIL_REJECTED);
                 $this->removeTags(self::EMAIL_CLEANED . ',' . self::EMAIL_VALIDATED);
 
-                // Same mapping as setEmail(): INVALID_EMAIL is shared by every customer, so it goes
-                // as <document>@noemail.com.
+                // Same mapping as setEmail(): INVALID_EMAIL is shared by every customer
                 if ($cleanedEmail === self::INVALID_EMAIL) {
-                    $localPart = $this->document
-                        ?? $this->service_uid
-                        ?? $this->telephone
-                        ?? null;
-
-                    $this->new_email = $localPart
-                        ? $localPart . '@noemail.com'
-                        : self::INVALID_EMAIL;
+                    $this->new_email = EmailCleanser::noemailFor($this->document ?? null, $this->service_uid ?? null, $this->telephone ?? null);
                 } else {
                     $this->new_email = $originalEmail;
                 }
