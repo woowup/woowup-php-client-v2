@@ -3,6 +3,7 @@
 namespace WoowUpV2\Models;
 
 use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
+use WoowUpV2\DataQuality\EmailCleanser;
 
 class UserEventModel implements \JsonSerializable
 {
@@ -120,8 +121,15 @@ class UserEventModel implements \JsonSerializable
     {
         if ((is_string($email) && (strlen($email) > 0)) || is_null($email)) {
             if ($sanitize) {
-                if (($email = $this->cleanser->email->sanitize($email)) === false) {
-                    trigger_error("Email sanitization of $email failed", E_USER_WARNING);
+                $originalEmail = $email;
+                $email = $this->cleanser->email->sanitize($email);
+
+                // A filler user ("no@mail.com") comes back as INVALID_EMAIL, the placeholder every
+                // customer shares: rejected like false so it isn't saved under it. Passing the
+                // placeholder itself still keeps it.
+                if ($email === false || ($email === EmailCleanser::INVALID_EMAIL
+                        && mb_strtolower(trim($originalEmail)) !== EmailCleanser::INVALID_EMAIL)) {
+                    trigger_error("Email sanitization of $originalEmail failed", E_USER_WARNING);
                     $email = null;
                 }
             }

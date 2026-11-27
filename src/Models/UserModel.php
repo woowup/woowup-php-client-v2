@@ -273,10 +273,25 @@ class UserModel implements \JsonSerializable
             $originalEmail = $email;
             $cleanedEmail = $this->cleanser->email->sanitize($email);
 
-            if ($cleanedEmail === false) {
-                $this->new_email = $originalEmail;
+            if ($cleanedEmail === false || $cleanedEmail === self::INVALID_EMAIL) {
                 $this->setTags(self::EMAIL_REJECTED);
                 $this->removeTags(self::EMAIL_CLEANED . ',' . self::EMAIL_VALIDATED);
+
+                // Same mapping as setEmail(): INVALID_EMAIL is shared by every customer, so it goes
+                // as <document>@noemail.com.
+                if ($cleanedEmail === self::INVALID_EMAIL) {
+                    $localPart = $this->document
+                        ?? $this->service_uid
+                        ?? $this->telephone
+                        ?? null;
+
+                    $this->new_email = $localPart
+                        ? $localPart . '@noemail.com'
+                        : self::INVALID_EMAIL;
+                } else {
+                    $this->new_email = $originalEmail;
+                }
+
                 trigger_error("Email sanitization of $originalEmail failed", E_USER_WARNING);
                 return $this;
             }
