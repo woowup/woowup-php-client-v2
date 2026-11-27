@@ -2,6 +2,7 @@
 
 namespace WoowUpV2\Models;
 
+use WoowUpV2\DataQuality\EmailCleanser;
 use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
 use WoowUpV2\Models\PurchaseItemModel as Item;
 use WoowUpV2\Models\PurchasePricesModel as Prices;
@@ -232,14 +233,9 @@ class PurchaseModel implements \JsonSerializable
 
             if ($cleanedEmail === false || $cleanedEmail === self::INVALID_EMAIL) {
                 if ($cleanedEmail === self::INVALID_EMAIL) {
-                    $localPart = $disableIdNoemail ? null : ($this->document
-                        ?? $this->service_uid
-                        ?? $this->telephone
-                        ?? null);
-
-                    $this->email = $localPart
-                        ? $localPart . '@noemail.com'
-                        : self::INVALID_EMAIL;
+                    $this->email = $disableIdNoemail
+                        ? self::INVALID_EMAIL
+                        : EmailCleanser::noemailFor($this->document ?? null, $this->service_uid ?? null, $this->telephone ?? null);
                 } else {
                     $this->email = $originalEmail;
                 }

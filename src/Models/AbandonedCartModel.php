@@ -105,8 +105,9 @@ class AbandonedCartModel implements \JsonSerializable
     {
         if ((is_string($email) && (strlen($email) > 0)) || is_null($email)) {
             if ($sanitize) {
-                if (($email = $this->cleanser->email->sanitize($email)) === false) {
-                    trigger_error("Email sanitization of $email failed", E_USER_WARNING);
+                $originalEmail = $email;
+                if (($email = $this->cleanser->email->sanitizeStrict($email)) === false) {
+                    trigger_error("Email sanitization of $originalEmail failed", E_USER_WARNING);
                     return $this;
                 }
             }

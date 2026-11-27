@@ -2,6 +2,7 @@
 
 namespace WoowUpV2\Models;
 
+use WoowUpV2\DataQuality\EmailCleanser;
 use WoowUpV2\DataQuality\DataCleanser as DataCleanser;
 
 /**
@@ -157,12 +158,9 @@ class PurchaseCustomerModel implements \JsonSerializable
             || !$this->cleanser->email->validate($cleanedEmail)
             || strlen($cleanedEmail) > self::EMAIL_MAX_LENGTH
         ) {
-            $localPart = $disableIdNoemail ? null : ($this->document
-                ?? $this->service_uid
-                ?? $this->telephone
-                ?? null);
-
-            $this->email = $localPart ? $localPart . '@noemail.com' : self::INVALID_EMAIL;
+            $this->email = $disableIdNoemail
+                ? self::INVALID_EMAIL
+                : EmailCleanser::noemailFor($this->document ?? null, $this->service_uid ?? null, $this->telephone ?? null);
             $this->setRaw('email_status', self::STATUS_REJECTED);
             trigger_error("Email sanitization of $email failed", E_USER_WARNING);
 
